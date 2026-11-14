@@ -10,30 +10,41 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # hermone-frontend
 
-Single-app Next.js 16 (App Router) + React 19 + Tailwind 4 + shadcn/ui. Not a monorepo. No CI, no pre-commit hooks, no test framework — don't look for one.
+Single-app Next.js 16 (App Router) + React 19 + Tailwind 4 + shadcn/ui. Not a monorepo. No CI, pre-commit hooks, or test framework — don't look for one.
 
 ## Commands (all verified)
 
 - `npm run dev` — dev server (Turbopack). **Re-writes the block above**; commit it with your changes to keep the tree clean.
-- `npx tsc --noEmit` — typecheck (there is no npm script for it). `next build` also typechecks and fails on type errors.
-- `npm run lint` — `eslint` with flat config (`eslint.config.mjs`). **Baseline is already failing**: 2 pre-existing `react-hooks/set-state-in-effect` errors in `src/components/ui/carousel.tsx` and `src/hooks/use-mobile.ts`. Don't assume lint is green, and don't "fix" those two in passing — just make sure you don't add new errors.
-- `npm run build` — production build; verified passing.
+- `npx tsc --noEmit` — typecheck (no npm script for it). `next build` also typechecks and fails on type errors.
+- `npm run lint` — repo-wide ESLint with flat config (`eslint.config.mjs`). **Baseline is already failing**: exactly 2 pre-existing `react-hooks/set-state-in-effect` errors in `src/components/ui/carousel.tsx` and `src/hooks/use-mobile.ts`. Don't assume lint is green, and don't "fix" those two in passing — just add no new errors.
+- `npm run build` — production build; verified passing. `/events/[slug]` is Partial Prerender (◐); other routes are static.
 - Use npm (`package-lock.json`). The README's yarn/pnpm/bun commands are boilerplate — ignore them.
 
 Suggested order: `npx tsc --noEmit` → `npm run lint` → `npm run build`.
 
 ## Architecture
 
-- App Router lives in `src/app/` (`layout.tsx`, `page.tsx`, `globals.css`). Path alias `@/*` → `./src/*` (tsconfig `paths`).
-- shadcn/ui components in `src/components/ui/`, configured by `components.json` (style `base-nova`, `rsc: true`, neutral, lucide icons). Add/regenerate with `npx shadcn add <component>` instead of hand-writing primitives; `components.json` defines the aliases `shadcn` writes into.
-- Hooks in `src/hooks/`, shared utils in `src/lib/utils.ts` (`cn`), code highlighting in `src/lib/highlighter.tsx`.
-- Components are folderized by page in `src/components/`: `layout/` (navbar, footer, theme-toggle — rendered by `src/app/layout.tsx` around every page), `home/`, `events/`, `auth/` (sign-in + sign-up), `shared/` (`subscribe-form`, used by both home and footer). shadcn primitives stay in `src/components/ui/`. `cn` is tailwind-merge-aware — later className entries win.
-- Routes: `/`, `/events`, `/sign-in`, `/sign-up` — kebab-case so the URL matches the component file names (`sign-in-form.tsx` ↔ `/sign-in`). Old spellings (`/signin`, `/signIn`, `/signup`, `/signUp`) redirect there via `next.config.ts` (Next redirects match case-insensitively, so never redirect between paths that differ only by case — it self-loops). Home/events content is data-driven from `src/lib/data.ts`; placeholder images live in `public/events/` and `public/gallery/` — swap image paths there.
+- Routes: `/`, `/events`, `/sign-in`, `/sign-up`, plus dynamic `/events/[slug]`. Old spellings `/signin` and `/signup` redirect via `next.config.ts`; redirects match case-insensitively, so `/signIn` etc. hit the same rules. Never redirect between paths that differ only by case — it self-loops.
+- App Router in `src/app/`; path alias `@/*` → `./src/*` (tsconfig `paths`). `src/app/layout.tsx` wraps every page with navbar/footer and an inline pre-paint script that puts `.dark` on `<html>` from `localStorage`/OS preference. `theme-toggle.tsx` only toggles that class — no React state, no `next-themes`.
+- Components are folderized by page: `layout/`, `home/`, `events/`, `auth/` (sign-in + sign-up), `shared/` (`subscribe-form`, used by home and footer); shadcn primitives stay in `ui/`. Content is static in `src/lib/data.ts` (`events`, `eventListings`, `eventCategories`, `galleryImages`); swap image paths there, with assets under `public/events/` and `public/gallery/`.
+- Placeholder images use plain `<img>` with an `eslint-disable-next-line @next/next/no-img-element` comment — replace with `next/image` when swapping in real photos.
+- Dates: list cards use `dateBadge()` (no `Date`, avoids timezone day shifts); `/events/[slug]` uses `formatEventDate()` / `formatEventTimeRange()` from `src/lib/format-event-date.ts` on ISO date-times.
+- `/events` search/filter/pagination is entirely client-side in `event-browser.tsx` (6 per page); the "Other" pill catches categories without their own pill. Event cards link to `/events/${event.id}`.
+- **Events backend**: `src/lib/events-api.ts` calls `GET {API_BASE_URL}/events/{slug}` (server-only env var; copy `.env.example` to `.env.local`). The `EventDetail` type there is the response contract. Missing event → `notFound()`; other non-OK responses throw.
+- `/events/[slug]/page.tsx` follows the Cache Components dynamic-params pattern: the page stays sync and wraps a child that awaits `params` + fetches in `<Suspense>` (fallback in `event-details-skeleton.tsx`). `generateMetadata` fetches the same URL (fetch is memoized per request). Keep this shape — awaiting `params` at the page top breaks with `cacheComponents`.
+- The details page exports `instant = false`: the root-layout navbar calls `usePathname()`, which cannot be prerendered for an unknown slug. Removing it makes `next build` fail with `CLIENT_HOOK_DYNAMIC`.
+- **No other backend**: no API routes, server actions, DB, or auth. Sign-in/sign-up and subscribe forms are client-side demos with fake success states — don't wire real auth without asking.
+
+## Code style
+
+- Prefer **simple, beginner-readable logic** over clever or complex code: small named functions, plain `if`/loops where clear, and direct calculations over extra state, indirection, or premature abstractions. Optimize for readability, not concision. Keep existing straightforward patterns instead of refactoring them.
 
 ## Toolchain quirks
 
-- **Tailwind 4, CSS-first**: no `tailwind.config` / PostCSS config. Tailwind loads via the `*.css` Turbopack loader rule in `next.config.ts`; styles are defined in `src/app/globals.css`. Don't add a Tailwind config file or PostCSS plugin.
-- **React Compiler is enabled** (`reactCompiler: true`, `babel-plugin-react-compiler`) — components must follow React Compiler rules (no mutating props, etc.).
+- **shadcn here is Base UI, not Radix**: `components.json` uses style `base-nova`, and the primitives in `src/components/ui/` import from `@base-ui/react/*`. Don't add `@radix-ui` packages or Radix-specific props; add/regenerate primitives with `npx shadcn add <component>` using the aliases in `components.json` instead of hand-writing them.
+- `src/lib/utils.ts` is only `export { cn } from "cn"` — the `cn` npm package (compiled clsx + tailwind-merge). Don't replace it with a local clsx/tailwind-merge helper. Later class names win.
+- **Tailwind 4, CSS-first**: no `tailwind.config` / PostCSS config. Tailwind loads via the `*.css` Turbopack loader rule in `next.config.ts`; theme and styles live in `src/app/globals.css`. Don't add a Tailwind config file or PostCSS plugin.
+- **React Compiler is enabled** (`reactCompiler: true`, `babel-plugin-react-compiler`) — follow React Compiler rules (no mutating props, etc.).
 - **`cacheComponents: true` + `partialPrefetching: true`** — caching and data-fetching semantics differ from stable Next.js. Consult `node_modules/next/dist/docs/` (not your training data) before relying on route caching, `revalidate`, or dynamic APIs.
 - `experimental.agentFeedback: true` is set intentionally — leave it alone.
-- README.md is untouched create-next-app boilerplate with wrong paths (says `app/page.tsx`; the real file is `src/app/page.tsx`). Trust the code over the README.
+- `README.md` is untouched create-next-app boilerplate with wrong paths (says `app/page.tsx`; the real file is `src/app/page.tsx`). Trust the code over the README.

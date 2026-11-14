@@ -15,7 +15,7 @@ function EventCard({ event }: { event: EventItem }) {
 
   return (
     <Link
-      href="/events"
+      href={`/events/${event.id}`}
       className="group block h-full overflow-hidden rounded-2xl border border-violet-100 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl dark:border-violet-900/40 dark:bg-slate-900"
     >
       <div className="relative aspect-[4/3] overflow-hidden">

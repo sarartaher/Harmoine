@@ -90,11 +90,11 @@ export function Navbar() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-violet-100 bg-white/80 backdrop-blur-md dark:border-violet-900/40 dark:bg-slate-950/80 container mx-auto">
-      <div className="mx-auto flex h-16 items-center justify-between gap-4 px-4 sm:px-6">
+    <header className="sticky top-0 z-40 border-b border-violet-100 bg-white/80 backdrop-blur-md dark:border-violet-900/40 dark:bg-slate-950/80 container mx-auto ">
+      <div className="mx-auto flex h-16 items-center justify-between gap-4 px-4 sm:px-6 ">
         <Logo />
 
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
+        <nav className="hidden items-center gap-1 md:flex" aria-label="Main" >
           {navLinks.map((link) => (
             <NavLink
               key={link.href}

@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import { ArrowUpRight, Heart, MapPin, Tag } from "lucide-react"
 import { dateBadge, type EventListing } from "@/lib/data"
 import { cn } from "@/lib/utils"
@@ -59,13 +60,13 @@ function EventCard({ event }: { event: EventListing }) {
             <Tag className="size-4 text-violet-600 dark:text-violet-400" />
             {event.category}
           </span>
-          <a
-            href="#"
+          <Link
+            href={`/events/${event.id}`}
             aria-label={`View ${event.title}`}
             className="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-md transition hover:from-violet-400 hover:to-indigo-500"
           >
             <ArrowUpRight className="size-4" />
-          </a>
+          </Link>
         </div>
       </div>
     </article>
