@@ -11,7 +11,7 @@ import {
   Tag,
   Users,
 } from "lucide-react"
-import type { EventDetail } from "@/lib/events-api"
+import type { EventDetail } from "@/interfaces"
 import {
   formatEventDate,
   formatEventTimeRange,
@@ -43,7 +43,7 @@ function DetailRow({
   )
 }
 
-function EventDetails({ event }: { event: EventDetail }) {
+export function EventDetails({ event }: { event: EventDetail }) {
   const date = formatEventDate(event.startDate, event.timeZone)
   const time = formatEventTimeRange(
     event.startDate,
@@ -298,5 +298,3 @@ function EventDetails({ event }: { event: EventDetail }) {
     </main>
   )
 }
-
-export { EventDetails }

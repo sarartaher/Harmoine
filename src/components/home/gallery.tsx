@@ -1,5 +1,6 @@
 "use client"
 
+import { EventImage } from "@/components/shared/event-image"
 import { useAppData } from "@/components/providers/app-data-provider"
 import { SectionHeading } from "@/components/home/section-heading"
 import {
@@ -9,15 +10,11 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
-import { eventImagePlaceholder } from "@/lib/placeholder"
+
+const skeletonItems = [1, 2, 3, 4]
 
 export function Gallery() {
-  const { gallery } = useAppData()
-
-  // Nothing to show until the backend gallery arrives.
-  if (gallery.length === 0) {
-    return null
-  }
+  const { gallery, loading } = useAppData()
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-r from-violet-600 via-indigo-600 to-violet-700 py-16 sm:py-20">
@@ -33,28 +30,48 @@ export function Gallery() {
       <div className="relative mx-auto max-w-7xl px-6">
         <SectionHeading title="Our Gallery" tone="light" />
 
-        <Carousel opts={{ align: "start", loop: true }} className="mt-10">
-          <CarouselContent>
-            {gallery.map((image) => (
-              <CarouselItem
-                key={image.id}
-                className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
-              >
-                <div className="group overflow-hidden rounded-2xl shadow-lg ring-1 ring-white/20">
-                  {/* eslint-disable-next-line @next/next/no-img-element -- backend image URL; swap for next/image if the host is configured */}
-                  <img
-                    src={image.src || eventImagePlaceholder}
-                    alt={image.alt || "Event photo"}
-                    loading="lazy"
-                    className="aspect-[4/3] w-full object-cover transition duration-300 group-hover:scale-105"
-                  />
-                </div>
-              </CarouselItem>
+        {loading ? (
+          <div
+            className="mt-10 grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+            aria-busy="true"
+            aria-label="Loading gallery"
+          >
+            {skeletonItems.map((item) => (
+              <div
+                key={item}
+                className="aspect-[4/3] animate-pulse rounded-2xl bg-white/15 ring-1 ring-white/20"
+              />
             ))}
-          </CarouselContent>
-          <CarouselPrevious className="-left-2 size-9 border-white/30 bg-white/15 text-white backdrop-blur hover:bg-white/25 hover:text-white sm:-left-4 dark:border-white/20" />
-          <CarouselNext className="-right-2 size-9 border-white/30 bg-white/15 text-white backdrop-blur hover:bg-white/25 hover:text-white sm:-right-4 dark:border-white/20" />
-        </Carousel>
+          </div>
+        ) : gallery.length > 0 ? (
+          <Carousel opts={{ align: "start", loop: true }} className="mt-10">
+            <CarouselContent>
+              {gallery.map((image) => (
+                <CarouselItem
+                  key={image.id}
+                  className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+                >
+                  <div className="group overflow-hidden rounded-2xl shadow-lg ring-1 ring-white/20">
+                    <EventImage
+                      src={image.src}
+                      alt={image.alt || "Event photo"}
+                      className="aspect-[4/3] w-full object-cover transition duration-300 group-hover:scale-105"
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="-left-2 size-9 border-white/30 bg-white/15 text-white backdrop-blur hover:bg-white/25 hover:text-white sm:-left-4 dark:border-white/20" />
+            <CarouselNext className="-right-2 size-9 border-white/30 bg-white/15 text-white backdrop-blur hover:bg-white/25 hover:text-white sm:-right-4 dark:border-white/20" />
+          </Carousel>
+        ) : (
+          <div className="mt-10 rounded-2xl border border-dashed border-white/30 bg-white/10 px-6 py-14 text-center text-white backdrop-blur">
+            <p className="font-medium">No gallery photos yet</p>
+            <p className="mt-1 text-sm text-white/80">
+              Photos from your backend will appear here.
+            </p>
+          </div>
+        )}
       </div>
     </section>
   )

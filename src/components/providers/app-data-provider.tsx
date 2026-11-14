@@ -4,41 +4,14 @@
 // Everything is fetched from the backend endpoints in `src/lib/endpoints.ts`.
 
 import * as React from "react"
+import type {
+  AccountProfile,
+  AppData,
+  EventSummary,
+  GalleryImage,
+} from "@/interfaces"
 import { apiUrl } from "@/lib/api"
 import { endpoints } from "@/lib/endpoints"
-
-export type EventSummary = {
-  slug: string
-  title: string
-  /** ISO 8601 date-time, e.g. "2026-08-26T18:00:00+01:00" */
-  startDate: string
-  /** IANA time zone for display, e.g. "Europe/London". */
-  timeZone?: string
-  location: string
-  category: string
-  image?: string
-}
-
-export type GalleryImage = {
-  id: string
-  src: string
-  alt?: string
-}
-
-export type AccountProfile = {
-  name?: string
-  email?: string
-  avatar?: string
-}
-
-type AppData = {
-  events: EventSummary[]
-  categories: string[]
-  gallery: GalleryImage[]
-  profile: AccountProfile | null
-  /** True until the first fetch finishes (or fails). */
-  loading: boolean
-}
 
 const emptyData: AppData = {
   events: [],

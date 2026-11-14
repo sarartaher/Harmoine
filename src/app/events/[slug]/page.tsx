@@ -3,16 +3,13 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { EventDetails } from "@/components/events/event-details"
 import { EventDetailsSkeleton } from "@/components/events/event-details-skeleton"
+import type { EventPageProps } from "@/interfaces"
 import { getEventBySlug } from "@/lib/events-api"
 
 // The shared navbar reads usePathname(), whose value is unknown for a dynamic
 // slug during prerendering. Opt this route out of instant navigation so the
 // page can render per request instead of blocking the build.
 export const instant = false
-
-type EventPageProps = {
-  params: Promise<{ slug: string }>
-}
 
 export async function generateMetadata({
   params,

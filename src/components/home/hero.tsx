@@ -1,5 +1,20 @@
 import Link from "next/link"
-import { ArrowRight } from "lucide-react"
+import {
+  ArrowRight,
+  CalendarDays,
+  HeartHandshake,
+  Sparkles,
+  Users,
+} from "lucide-react"
+
+// Simple list of the things Hermone helps people do. Each item has a lucide
+// icon and a short label, so we do not need any hand-drawn SVG artwork.
+const highlights = [
+  { label: "Discover events", icon: CalendarDays },
+  { label: "Meet new people", icon: Users },
+  { label: "Build community", icon: HeartHandshake },
+  { label: "Make memories", icon: Sparkles },
+]
 
 export function Hero() {
   return (
@@ -32,19 +47,22 @@ export function Hero() {
         </div>
 
         <div className="relative">
-          {/* purple arc behind the photo */}
+          {/* soft glow behind the panel */}
           <div
             aria-hidden
             className="absolute -inset-4 rounded-[2.5rem] bg-gradient-to-br from-violet-500/30 via-fuchsia-400/20 to-indigo-500/30 blur-xl dark:from-violet-500/20 dark:to-indigo-500/20 lg:-inset-8"
           />
-          <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] shadow-2xl ring-1 ring-white/60 lg:aspect-[5/4]">
-            {/* eslint-disable-next-line @next/next/no-img-element -- placeholder illustration; swap for next/image when adding a real photo */}
-            <img
-              src="/hero-collaboration.svg"
-              alt="A group of people collaborating around a laptop"
-              className="h-full w-full object-cover"
-              loading="eager"
-            />
+
+          <div className="relative grid aspect-[4/3] grid-cols-2 gap-4 rounded-[2rem] bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-600 p-6 shadow-2xl ring-1 ring-white/30 sm:p-8 lg:aspect-[5/4]">
+            {highlights.map(({ label, icon: Icon }) => (
+              <div
+                key={label}
+                className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-white/15 p-4 text-center text-white backdrop-blur"
+              >
+                <Icon className="size-8" />
+                <span className="text-sm font-semibold">{label}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

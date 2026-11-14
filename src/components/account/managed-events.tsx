@@ -10,16 +10,24 @@ import {
 } from "@/app/account/events/actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import type { ManagedEvent, ManagedEventStatus } from "@/lib/account-api"
+import type {
+  ManagedEvent,
+  ManagedEventStatus,
+  ManagedEventsFilter,
+} from "@/interfaces"
+import { EventImage } from "@/components/shared/event-image"
 import { formatEventDateShort } from "@/lib/format-event-date"
-import { eventImagePlaceholder } from "@/lib/placeholder"
 import { cn } from "@/lib/utils"
 
-const statusFilters = ["all", "published", "draft", "past", "cancelled"] as const
+const statusFilters: ManagedEventsFilter[] = [
+  "all",
+  "published",
+  "draft",
+  "past",
+  "cancelled",
+]
 
-type StatusFilter = (typeof statusFilters)[number]
-
-function statusLabel(filter: StatusFilter) {
+function statusLabel(filter: ManagedEventsFilter) {
   if (filter === "all") return "All"
   return filter.charAt(0).toUpperCase() + filter.slice(1)
 }
@@ -126,7 +134,7 @@ function attendeesText(event: ManagedEvent) {
 
 export function ManagedEvents({ events }: { events: ManagedEvent[] }) {
   const [query, setQuery] = React.useState("")
-  const [status, setStatus] = React.useState<StatusFilter>("all")
+  const [status, setStatus] = React.useState<ManagedEventsFilter>("all")
 
   const search = query.trim().toLowerCase()
 
@@ -206,11 +214,10 @@ export function ManagedEvents({ events }: { events: ManagedEvent[] }) {
                 >
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
-                      {/* eslint-disable-next-line @next/next/no-img-element -- backend image URL; swap for next/image if the host is configured */}
-                      <img
-                        src={event.image || eventImagePlaceholder}
+                      <EventImage
+                        src={event.image}
                         alt=""
-                        loading="lazy"
+                        iconClassName="size-5"
                         className="size-12 shrink-0 rounded-lg object-cover"
                       />
                       <div>
@@ -250,11 +257,10 @@ export function ManagedEvents({ events }: { events: ManagedEvent[] }) {
             {filtered.map((event) => (
               <div key={event.slug} className="space-y-4 p-4">
                 <div className="flex items-start gap-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element -- backend image URL; swap for next/image if the host is configured */}
-                  <img
-                    src={event.image || eventImagePlaceholder}
+                  <EventImage
+                    src={event.image}
                     alt=""
-                    loading="lazy"
+                    iconClassName="size-7"
                     className="size-16 shrink-0 rounded-xl object-cover"
                   />
                   <div className="min-w-0 flex-1">

@@ -15,35 +15,7 @@
 import { connection } from "next/server"
 import { apiUrl } from "@/lib/api"
 import { endpoints } from "@/lib/endpoints"
-
-export type ManagedEventStatus = "published" | "draft" | "past" | "cancelled"
-
-export type ManagedEvent = {
-  slug: string
-  title: string
-  image?: string
-  /** ISO 8601 date-time, e.g. "2026-08-26T18:00:00+01:00" */
-  startDate: string
-  timeZone?: string
-  location: string
-  category: string
-  status: ManagedEventStatus
-  attendees?: number
-  capacity?: number
-}
-
-export type JoinedEvent = {
-  slug: string
-  title: string
-  image?: string
-  /** ISO 8601 date-time, e.g. "2026-08-26T18:00:00+01:00" */
-  startDate: string
-  timeZone?: string
-  location: string
-  category: string
-  /** ISO 8601 date-time for when the user joined. */
-  joinedAt?: string
-}
+import type { JoinedEvent, ManagedEvent } from "@/interfaces"
 
 async function getList<T>(path: string): Promise<T> {
   // These lists belong to the signed-in user, so they must be fetched per

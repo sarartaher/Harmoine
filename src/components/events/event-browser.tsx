@@ -9,6 +9,7 @@ import { EventsPagination } from "@/components/events/events-pagination"
 import { EventsToolbar } from "@/components/events/events-toolbar"
 
 const PAGE_SIZE = 6
+const skeletonCards = [1, 2, 3, 4, 5, 6]
 
 export function EventBrowser() {
   const { events, categories, loading } = useAppData()
@@ -64,9 +65,9 @@ export function EventBrowser() {
 
         {loading ? (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: PAGE_SIZE }).map((_, index) => (
+            {skeletonCards.map((item) => (
               <div
-                key={index}
+                key={item}
                 className="h-80 animate-pulse rounded-2xl bg-white dark:bg-slate-900"
               />
             ))}

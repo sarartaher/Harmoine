@@ -1,12 +1,14 @@
+const skeletonRows = [1, 2, 3, 4, 5]
+
 export function ManagedEventsSkeleton() {
   return (
     <div className="space-y-6" aria-busy="true" aria-label="Loading your events">
       <div className="h-20 animate-pulse rounded-2xl bg-white dark:bg-slate-900" />
 
       <div className="overflow-hidden rounded-2xl border border-violet-100 bg-white dark:border-violet-900/40 dark:bg-slate-900">
-        {Array.from({ length: 5 }).map((_, index) => (
+        {skeletonRows.map((row) => (
           <div
-            key={index}
+            key={row}
             className="flex items-center gap-4 border-b border-violet-100 p-5 last:border-b-0 dark:border-violet-900/40"
           >
             <div className="size-12 animate-pulse rounded-lg bg-slate-200 dark:bg-slate-800" />

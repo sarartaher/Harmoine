@@ -5,16 +5,14 @@ import Link from "next/link"
 import { ArrowUpRight, CalendarX2, MapPin, Search, Tag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import type { JoinedEvent } from "@/lib/account-api"
+import type { JoinedEvent, JoinedEventsTab } from "@/interfaces"
+import { EventImage } from "@/components/shared/event-image"
 import { formatEventDateShort } from "@/lib/format-event-date"
-import { eventImagePlaceholder } from "@/lib/placeholder"
 import { cn } from "@/lib/utils"
 
-const tabs = ["all", "upcoming", "past"] as const
+const tabs: JoinedEventsTab[] = ["all", "upcoming", "past"]
 
-type Tab = (typeof tabs)[number]
-
-function tabLabel(tab: Tab) {
+function tabLabel(tab: JoinedEventsTab) {
   if (tab === "all") return "All"
   return tab.charAt(0).toUpperCase() + tab.slice(1)
 }
@@ -26,7 +24,7 @@ function isPast(event: JoinedEvent, now: number) {
 
 export function JoinedEvents({ events }: { events: JoinedEvent[] }) {
   const [query, setQuery] = React.useState("")
-  const [tab, setTab] = React.useState<Tab>("all")
+  const [tab, setTab] = React.useState<JoinedEventsTab>("all")
 
   // Capture "now" once so the Upcoming/Past split stays stable while the
   // user is on the page.
@@ -96,11 +94,9 @@ export function JoinedEvents({ events }: { events: JoinedEvent[] }) {
               className="group flex h-full flex-col overflow-hidden rounded-2xl border border-violet-100 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl dark:border-violet-900/40 dark:bg-slate-900"
             >
               <div className="relative aspect-[16/10] overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element -- backend image URL; swap for next/image if the host is configured */}
-                <img
-                  src={event.image || eventImagePlaceholder}
+                <EventImage
+                  src={event.image}
                   alt={event.title}
-                  loading="lazy"
                   className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                 />
                 <span className="absolute top-3 left-3 rounded-lg bg-white px-2.5 py-1 text-xs font-semibold text-violet-700 shadow-md dark:bg-slate-900 dark:text-violet-300">

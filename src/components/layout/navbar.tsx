@@ -106,7 +106,7 @@ export function Navbar() {
       <div className="mx-auto flex h-16 items-center justify-between gap-4 px-4 sm:px-6 ">
         <Logo />
 
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Main" >
+        <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
           {navLinks.map((link) => (
             <NavLink
               key={link.href}

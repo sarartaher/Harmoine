@@ -3,23 +3,21 @@
 import * as React from "react"
 import Link from "next/link"
 import { ArrowUpRight, Heart, MapPin, Tag } from "lucide-react"
-import type { EventSummary } from "@/components/providers/app-data-provider"
+import { EventImage } from "@/components/shared/event-image"
+import type { EventSummary } from "@/interfaces"
 import { formatDateBadge } from "@/lib/format-event-date"
-import { eventImagePlaceholder } from "@/lib/placeholder"
 import { cn } from "@/lib/utils"
 
-function EventCard({ event }: { event: EventSummary }) {
+export function EventCard({ event }: { event: EventSummary }) {
   const { month, day } = formatDateBadge(event.startDate, event.timeZone)
   const [favorite, setFavorite] = React.useState(false)
 
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-violet-100 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl dark:border-violet-900/40 dark:bg-slate-900">
       <div className="relative aspect-[4/3] overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element -- backend image URL; swap for next/image if the host is configured */}
-        <img
-          src={event.image || eventImagePlaceholder}
+        <EventImage
+          src={event.image}
           alt={event.title}
-          loading="lazy"
           className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
         />
         <div className="absolute top-3 left-3 rounded-lg bg-white px-2.5 py-1 text-center shadow-md dark:bg-slate-900">
@@ -74,5 +72,3 @@ function EventCard({ event }: { event: EventSummary }) {
     </article>
   )
 }
-
-export { EventCard }

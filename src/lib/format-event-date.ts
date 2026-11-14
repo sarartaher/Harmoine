@@ -31,7 +31,7 @@ export function formatEventDateShort(value: string, timeZone?: string) {
   }).format(date)
 }
 
-export function formatEventTime(value: string, timeZone?: string) {
+function formatEventTime(value: string, timeZone?: string) {
   const date = parseDate(value)
   if (!date) return value
 

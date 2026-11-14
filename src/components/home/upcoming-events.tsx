@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { MapPin } from "lucide-react"
 import { useAppData } from "@/components/providers/app-data-provider"
-import type { EventSummary } from "@/components/providers/app-data-provider"
+import type { EventSummary } from "@/interfaces"
 import { SectionHeading } from "@/components/home/section-heading"
 import {
   Carousel,
@@ -13,7 +13,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel"
 import { formatDateBadge } from "@/lib/format-event-date"
-import { eventImagePlaceholder } from "@/lib/placeholder"
+import { EventImage } from "@/components/shared/event-image"
 
 function EventCard({ event }: { event: EventSummary }) {
   const { month, day } = formatDateBadge(event.startDate, event.timeZone)
@@ -24,11 +24,9 @@ function EventCard({ event }: { event: EventSummary }) {
       className="group block h-full overflow-hidden rounded-2xl border border-violet-100 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl dark:border-violet-900/40 dark:bg-slate-900"
     >
       <div className="relative aspect-[4/3] overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element -- backend image URL; swap for next/image if the host is configured */}
-        <img
-          src={event.image || eventImagePlaceholder}
+        <EventImage
+          src={event.image}
           alt={event.title}
-          loading="lazy"
           className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
         />
         <div className="absolute top-3 left-3 rounded-lg bg-white px-2.5 py-1 text-center shadow-md dark:bg-slate-900">
@@ -53,34 +51,64 @@ function EventCard({ event }: { event: EventSummary }) {
   )
 }
 
-export function UpcomingEvents() {
-  const { events } = useAppData()
-  const upcoming = events.slice(0, 6)
+const skeletonCards = [1, 2, 3]
 
-  // Nothing to show until the backend list arrives.
-  if (upcoming.length === 0) {
-    return null
-  }
+function EventCardSkeleton() {
+  return (
+    <div className="overflow-hidden rounded-2xl border border-violet-100 bg-white shadow-sm dark:border-violet-900/40 dark:bg-slate-900">
+      <div className="aspect-[4/3] animate-pulse bg-slate-200 dark:bg-slate-800" />
+      <div className="space-y-3 p-4">
+        <div className="h-4 w-3/4 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
+        <div className="h-3 w-1/2 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
+      </div>
+    </div>
+  )
+}
+
+export function UpcomingEvents() {
+  const { events, loading } = useAppData()
+  const upcoming = events.slice(0, 6)
 
   return (
     <section className="bg-white py-16 dark:bg-slate-950 sm:py-20">
       <div className="mx-auto max-w-7xl px-6">
         <SectionHeading title="Upcoming Events" />
 
-        <Carousel opts={{ align: "start", loop: true }} className="mt-12">
-          <CarouselContent>
-            {upcoming.map((event) => (
-              <CarouselItem
-                key={event.slug}
-                className="basis-full sm:basis-1/2 lg:basis-1/3"
-              >
-                <EventCard event={event} />
-              </CarouselItem>
+        {loading ? (
+          <div
+            className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+            aria-busy="true"
+            aria-label="Loading upcoming events"
+          >
+            {skeletonCards.map((item) => (
+              <EventCardSkeleton key={item} />
             ))}
-          </CarouselContent>
-          <CarouselPrevious className="-left-2 size-9 bg-white shadow-md sm:-left-4 dark:bg-slate-800" />
-          <CarouselNext className="-right-2 size-9 bg-white shadow-md sm:-right-4 dark:bg-slate-800" />
-        </Carousel>
+          </div>
+        ) : upcoming.length > 0 ? (
+          <Carousel opts={{ align: "start", loop: true }} className="mt-12">
+            <CarouselContent>
+              {upcoming.map((event) => (
+                <CarouselItem
+                  key={event.slug}
+                  className="basis-full sm:basis-1/2 lg:basis-1/3"
+                >
+                  <EventCard event={event} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="-left-2 size-9 bg-white shadow-md sm:-left-4 dark:bg-slate-800" />
+            <CarouselNext className="-right-2 size-9 bg-white shadow-md sm:-right-4 dark:bg-slate-800" />
+          </Carousel>
+        ) : (
+          <div className="mt-12 rounded-2xl border border-dashed border-violet-200 bg-white py-14 text-center dark:border-violet-900/50 dark:bg-slate-900">
+            <p className="font-medium text-slate-900 dark:text-white">
+              No upcoming events yet
+            </p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              Events from your backend will appear here.
+            </p>
+          </div>
+        )}
 
         <div className="mt-10 flex justify-center">
           <Link

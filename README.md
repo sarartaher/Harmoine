@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Hermone — frontend
 
-## Getting Started
+Next.js 16 (App Router) + React 19 + Tailwind 4 + shadcn/ui. All content comes from a backend API.
 
-First, run the development server:
+## Setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. `npm install`
+2. Copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_API_BASE_URL` to your backend URL.
+3. Fill in the backend paths in `src/lib/endpoints.ts`.
+4. `npm run dev` and open http://localhost:3000.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The browser fetches the backend directly, so the backend must allow this site's origin (CORS).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Pages
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Route             | File                                    |
+| ----------------- | --------------------------------------- |
+| `/`               | `src/app/page.tsx`                      |
+| `/events`         | `src/app/events/page.tsx`               |
+| `/events/[slug]`  | `src/app/events/[slug]/page.tsx`        |
+| `/account/events` | `src/app/account/events/page.tsx`       |
+| `/account/joined` | `src/app/account/joined/page.tsx`       |
+| `/sign-in`        | `src/app/sign-in/page.tsx`              |
+| `/sign-up`        | `src/app/sign-up/page.tsx`              |
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+- `npm run dev` — dev server (Turbopack)
+- `npm run build` — production build
+- `npm run lint` — ESLint
+- `npx tsc --noEmit` — typecheck
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Layout
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `src/app/` — routes
+- `src/components/` — UI grouped by page (`home/`, `events/`, `account/`, `auth/`, `layout/`) plus `ui/` primitives
+- `src/interfaces/` — all shared TypeScript types
+- `src/lib/` — API helpers, endpoint paths, formatters
 
-## Deploy on Vercel
+## Notes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- There is no auth or database yet: sign-in, sign-up, and the subscribe form are client-side demos.
+- Event images come from the backend; a gradient placeholder is shown when a URL is missing.
