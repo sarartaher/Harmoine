@@ -19,6 +19,18 @@ export function formatEventDate(value: string, timeZone?: string) {
   }).format(date)
 }
 
+export function formatEventDateShort(value: string, timeZone?: string) {
+  const date = parseDate(value)
+  if (!date) return value
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone,
+  }).format(date)
+}
+
 export function formatEventTime(value: string, timeZone?: string) {
   const date = parseDate(value)
   if (!date) return value

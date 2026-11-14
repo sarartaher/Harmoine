@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  CalendarDays,
   ChevronDown,
   HeartHandshake,
   LogOut,
   Menu,
   Settings,
+  Ticket,
   User,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -121,6 +123,13 @@ export function Navbar() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuLabel>Hermone</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem render={<Link href="/account/events" />}>
+                <CalendarDays /> My Events
+              </DropdownMenuItem>
+              <DropdownMenuItem render={<Link href="/account/joined" />}>
+                <Ticket /> Joined Events
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <User /> Profile

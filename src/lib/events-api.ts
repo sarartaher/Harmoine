@@ -7,6 +7,8 @@
 // Set API_BASE_URL in .env.local (see .env.example). It is server-only, so
 // the backend URL is never sent to the browser.
 
+import { apiUrl } from "@/lib/api"
+
 export type EventAgendaItem = {
   time: string
   title: string
@@ -44,16 +46,7 @@ export type EventDetail = {
 }
 
 export async function getEventBySlug(slug: string): Promise<EventDetail | null> {
-  const baseUrl = process.env.API_BASE_URL
-
-  if (!baseUrl) {
-    throw new Error(
-      "API_BASE_URL is not set. Add it to .env.local (see .env.example)."
-    )
-  }
-
-  const cleanBaseUrl = baseUrl.replace(/\/$/, "")
-  const url = `${cleanBaseUrl}/events/${encodeURIComponent(slug)}`
+  const url = apiUrl(`/events/${encodeURIComponent(slug)}`)
 
   // "no-store" keeps the page fresh: the backend is the source of truth.
   const response = await fetch(url, { cache: "no-store" })

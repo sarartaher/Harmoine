@@ -17,23 +17,26 @@ Single-app Next.js 16 (App Router) + React 19 + Tailwind 4 + shadcn/ui. Not a mo
 - `npm run dev` — dev server (Turbopack). **Re-writes the block above**; commit it with your changes to keep the tree clean.
 - `npx tsc --noEmit` — typecheck (no npm script for it). `next build` also typechecks and fails on type errors.
 - `npm run lint` — repo-wide ESLint with flat config (`eslint.config.mjs`). **Baseline is already failing**: exactly 2 pre-existing `react-hooks/set-state-in-effect` errors in `src/components/ui/carousel.tsx` and `src/hooks/use-mobile.ts`. Don't assume lint is green, and don't "fix" those two in passing — just add no new errors.
-- `npm run build` — production build; verified passing. `/events/[slug]` is Partial Prerender (◐); other routes are static.
+- `npm run build` — production build; verified passing. `/events/[slug]`, `/account/events`, and `/account/joined` are Partial Prerender (◐); other routes are static.
 - Use npm (`package-lock.json`). The README's yarn/pnpm/bun commands are boilerplate — ignore them.
 
 Suggested order: `npx tsc --noEmit` → `npm run lint` → `npm run build`.
 
 ## Architecture
 
-- Routes: `/`, `/events`, `/sign-in`, `/sign-up`, plus dynamic `/events/[slug]`. Old spellings `/signin` and `/signup` redirect via `next.config.ts`; redirects match case-insensitively, so `/signIn` etc. hit the same rules. Never redirect between paths that differ only by case — it self-loops.
+- Routes: `/`, `/events`, `/sign-in`, `/sign-up`, `/account/events`, `/account/joined`, plus dynamic `/events/[slug]`. Old spellings `/signin` and `/signup` redirect via `next.config.ts`; redirects match case-insensitively, so `/signIn` etc. hit the same rules. Never redirect between paths that differ only by case — it self-loops.
 - App Router in `src/app/`; path alias `@/*` → `./src/*` (tsconfig `paths`). `src/app/layout.tsx` wraps every page with navbar/footer and an inline pre-paint script that puts `.dark` on `<html>` from `localStorage`/OS preference. `theme-toggle.tsx` only toggles that class — no React state, no `next-themes`.
-- Components are folderized by page: `layout/`, `home/`, `events/`, `auth/` (sign-in + sign-up), `shared/` (`subscribe-form`, used by home and footer); shadcn primitives stay in `ui/`. Content is static in `src/lib/data.ts` (`events`, `eventListings`, `eventCategories`, `galleryImages`); swap image paths there, with assets under `public/events/` and `public/gallery/`.
+- Components are folderized by page: `layout/`, `home/`, `events/`, `account/`, `auth/` (sign-in + sign-up), `shared/` (`subscribe-form`, used by home and footer); shadcn primitives stay in `ui/`. Content is static in `src/lib/data.ts` (`events`, `eventListings`, `eventCategories`, `galleryImages`); swap image paths there, with assets under `public/events/` and `public/gallery/`.
 - Placeholder images use plain `<img>` with an `eslint-disable-next-line @next/next/no-img-element` comment — replace with `next/image` when swapping in real photos.
 - Dates: list cards use `dateBadge()` (no `Date`, avoids timezone day shifts); `/events/[slug]` uses `formatEventDate()` / `formatEventTimeRange()` from `src/lib/format-event-date.ts` on ISO date-times.
 - `/events` search/filter/pagination is entirely client-side in `event-browser.tsx` (6 per page); the "Other" pill catches categories without their own pill. Event cards link to `/events/${event.id}`.
 - **Events backend**: `src/lib/events-api.ts` calls `GET {API_BASE_URL}/events/{slug}` (server-only env var; copy `.env.example` to `.env.local`). The `EventDetail` type there is the response contract. Missing event → `notFound()`; other non-OK responses throw.
 - `/events/[slug]/page.tsx` follows the Cache Components dynamic-params pattern: the page stays sync and wraps a child that awaits `params` + fetches in `<Suspense>` (fallback in `event-details-skeleton.tsx`). `generateMetadata` fetches the same URL (fetch is memoized per request). Keep this shape — awaiting `params` at the page top breaks with `cacheComponents`.
 - The details page exports `instant = false`: the root-layout navbar calls `usePathname()`, which cannot be prerendered for an unknown slug. Removing it makes `next build` fail with `CLIENT_HOOK_DYNAMIC`.
-- **No other backend**: no API routes, server actions, DB, or auth. Sign-in/sign-up and subscribe forms are client-side demos with fake success states — don't wire real auth without asking.
+- **Account pages**: `/account/events` (`managed-events.tsx`) and `/account/joined` (`joined-events.tsx`) are client-side search/filter views fed by server components. Data comes from `src/lib/account-api.ts`: `GET {API_BASE_URL}/account/events` → `ManagedEvent[]` and `GET {API_BASE_URL}/account/joined` → `JoinedEvent[]`. Both pages follow the same sync-page + `<Suspense>` + async-child shape as the details page; skeletons are in `src/components/account/`. `getList()` calls `await connection()` first, so the build does not try to fetch these per-user lists (without it `npm run build` fails when `API_BASE_URL` is unset).
+- Mutations on `/account/events` are server actions in `src/app/account/events/actions.ts`: `PATCH {API_BASE_URL}/account/events/{slug}` with `{ "status": "published" | "draft" }`, and `DELETE {API_BASE_URL}/account/events/{slug}`. Both call `revalidatePath("/account/events")`. Forms pass `slug`/`status` as hidden inputs (no `.bind` in client code).
+- The profile dropdown in `layout/navbar.tsx` links to My Events and Joined Events. It is always visible because there is no auth yet.
+- **No auth, no API routes, no DB**: account pages have **no auth guard**, and backend calls carry no session token. Sign-in/sign-up and subscribe forms are client-side demos with fake success states — don't wire real auth without asking.
 
 ## Code style
 
