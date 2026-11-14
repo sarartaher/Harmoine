@@ -1,5 +1,9 @@
+"use client"
+
 import Link from "next/link"
 import { MapPin } from "lucide-react"
+import { useAppData } from "@/components/providers/app-data-provider"
+import type { EventSummary } from "@/components/providers/app-data-provider"
 import { SectionHeading } from "@/components/home/section-heading"
 import {
   Carousel,
@@ -8,20 +12,21 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
-import { dateBadge, events, type EventItem } from "@/lib/data"
+import { formatDateBadge } from "@/lib/format-event-date"
+import { eventImagePlaceholder } from "@/lib/placeholder"
 
-function EventCard({ event }: { event: EventItem }) {
-  const { month, day } = dateBadge(event.date)
+function EventCard({ event }: { event: EventSummary }) {
+  const { month, day } = formatDateBadge(event.startDate, event.timeZone)
 
   return (
     <Link
-      href={`/events/${event.id}`}
+      href={`/events/${event.slug}`}
       className="group block h-full overflow-hidden rounded-2xl border border-violet-100 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl dark:border-violet-900/40 dark:bg-slate-900"
     >
       <div className="relative aspect-[4/3] overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element -- placeholder; swap for next/image with a real photo */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- backend image URL; swap for next/image if the host is configured */}
         <img
-          src={event.image}
+          src={event.image || eventImagePlaceholder}
           alt={event.title}
           loading="lazy"
           className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
@@ -49,6 +54,14 @@ function EventCard({ event }: { event: EventItem }) {
 }
 
 export function UpcomingEvents() {
+  const { events } = useAppData()
+  const upcoming = events.slice(0, 6)
+
+  // Nothing to show until the backend list arrives.
+  if (upcoming.length === 0) {
+    return null
+  }
+
   return (
     <section className="bg-white py-16 dark:bg-slate-950 sm:py-20">
       <div className="mx-auto max-w-7xl px-6">
@@ -56,9 +69,9 @@ export function UpcomingEvents() {
 
         <Carousel opts={{ align: "start", loop: true }} className="mt-12">
           <CarouselContent>
-            {events.map((event) => (
+            {upcoming.map((event) => (
               <CarouselItem
-                key={event.id}
+                key={event.slug}
                 className="basis-full sm:basis-1/2 lg:basis-1/3"
               >
                 <EventCard event={event} />

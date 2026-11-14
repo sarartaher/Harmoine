@@ -1,13 +1,13 @@
-// The event details page reads from the events backend.
+// The details page reads from the events backend.
 //
 // Expected request:
-//   GET {API_BASE_URL}/events/{slug}
+//   GET {NEXT_PUBLIC_API_BASE_URL}/events/{slug}   (path in src/lib/endpoints.ts)
 //
 // Expected response: one event object shaped like `EventDetail` below.
-// Set API_BASE_URL in .env.local (see .env.example). It is server-only, so
-// the backend URL is never sent to the browser.
+// Set NEXT_PUBLIC_API_BASE_URL in .env.local (see .env.example).
 
 import { apiUrl } from "@/lib/api"
+import { endpoints } from "@/lib/endpoints"
 
 export type EventAgendaItem = {
   time: string
@@ -46,7 +46,7 @@ export type EventDetail = {
 }
 
 export async function getEventBySlug(slug: string): Promise<EventDetail | null> {
-  const url = apiUrl(`/events/${encodeURIComponent(slug)}`)
+  const url = apiUrl(endpoints.event(slug))
 
   // "no-store" keeps the page fresh: the backend is the source of truth.
   const response = await fetch(url, { cache: "no-store" })

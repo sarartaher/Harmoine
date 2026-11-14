@@ -9,6 +9,7 @@
 
 import { revalidatePath } from "next/cache"
 import { apiUrl } from "@/lib/api"
+import { endpoints } from "@/lib/endpoints"
 
 export async function setManagedEventStatus(formData: FormData) {
   const slug = String(formData.get("slug") ?? "")
@@ -19,14 +20,11 @@ export async function setManagedEventStatus(formData: FormData) {
     return
   }
 
-  const response = await fetch(
-    apiUrl(`/account/events/${encodeURIComponent(slug)}`),
-    {
-      method: "PATCH",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ status }),
-    }
-  )
+  const response = await fetch(apiUrl(endpoints.managedEvent(slug)), {
+    method: "PATCH",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ status }),
+  })
 
   if (!response.ok) {
     throw new Error(`Failed to update "${slug}" (${response.status})`)
@@ -42,10 +40,9 @@ export async function deleteManagedEvent(formData: FormData) {
     return
   }
 
-  const response = await fetch(
-    apiUrl(`/account/events/${encodeURIComponent(slug)}`),
-    { method: "DELETE" }
-  )
+  const response = await fetch(apiUrl(endpoints.managedEvent(slug)), {
+    method: "DELETE",
+  })
 
   if (!response.ok) {
     throw new Error(`Failed to delete "${slug}" (${response.status})`)

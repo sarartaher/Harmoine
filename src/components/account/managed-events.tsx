@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { ManagedEvent, ManagedEventStatus } from "@/lib/account-api"
 import { formatEventDateShort } from "@/lib/format-event-date"
+import { eventImagePlaceholder } from "@/lib/placeholder"
 import { cn } from "@/lib/utils"
 
 const statusFilters = ["all", "published", "draft", "past", "cancelled"] as const
@@ -207,7 +208,7 @@ export function ManagedEvents({ events }: { events: ManagedEvent[] }) {
                     <div className="flex items-center gap-3">
                       {/* eslint-disable-next-line @next/next/no-img-element -- backend image URL; swap for next/image if the host is configured */}
                       <img
-                        src={event.image}
+                        src={event.image || eventImagePlaceholder}
                         alt=""
                         loading="lazy"
                         className="size-12 shrink-0 rounded-lg object-cover"
@@ -251,7 +252,7 @@ export function ManagedEvents({ events }: { events: ManagedEvent[] }) {
                 <div className="flex items-start gap-3">
                   {/* eslint-disable-next-line @next/next/no-img-element -- backend image URL; swap for next/image if the host is configured */}
                   <img
-                    src={event.image}
+                    src={event.image || eventImagePlaceholder}
                     alt=""
                     loading="lazy"
                     className="size-16 shrink-0 rounded-xl object-cover"

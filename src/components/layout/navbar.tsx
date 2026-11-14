@@ -12,7 +12,7 @@ import {
   Ticket,
   User,
 } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +29,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useAppData } from "@/components/providers/app-data-provider";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -90,6 +91,15 @@ function NavLink({
 
 export function Navbar() {
   const pathname = usePathname();
+  const { profile } = useAppData();
+
+  const displayName = profile?.name?.trim() || "Hermone";
+  const initials = displayName
+    .split(" ")
+    .map((part) => part.charAt(0))
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   return (
     <header className="sticky top-0 z-40 border-b border-violet-100 bg-white/80 backdrop-blur-md dark:border-violet-900/40 dark:bg-slate-950/80 container mx-auto ">
@@ -115,14 +125,17 @@ export function Navbar() {
               className="flex items-center gap-1 rounded-full p-0.5 outline-none hover:bg-violet-50 focus-visible:ring-2 focus-visible:ring-violet-500/50 dark:hover:bg-violet-500/10"
             >
               <Avatar size="sm">
+                {profile?.avatar ? (
+                  <AvatarImage src={profile.avatar} alt={displayName} />
+                ) : null}
                 <AvatarFallback className="bg-gradient-to-br from-violet-500 to-indigo-600 font-semibold text-white">
-                  H
+                  {initials}
                 </AvatarFallback>
               </Avatar>
               <ChevronDown className="size-3.5 text-slate-500 dark:text-slate-400" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel>Hermone</DropdownMenuLabel>
+              <DropdownMenuLabel>{displayName}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem render={<Link href="/account/events" />}>
                 <CalendarDays /> My Events

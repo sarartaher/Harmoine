@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { JoinedEvent } from "@/lib/account-api"
 import { formatEventDateShort } from "@/lib/format-event-date"
+import { eventImagePlaceholder } from "@/lib/placeholder"
 import { cn } from "@/lib/utils"
 
 const tabs = ["all", "upcoming", "past"] as const
@@ -97,7 +98,7 @@ export function JoinedEvents({ events }: { events: JoinedEvent[] }) {
               <div className="relative aspect-[16/10] overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element -- backend image URL; swap for next/image if the host is configured */}
                 <img
-                  src={event.image}
+                  src={event.image || eventImagePlaceholder}
                   alt={event.title}
                   loading="lazy"
                   className="h-full w-full object-cover transition duration-300 group-hover:scale-105"

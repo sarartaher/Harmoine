@@ -1,25 +1,27 @@
 // The account pages read the signed-in user's events from the backend.
+// Route paths live in `src/lib/endpoints.ts`.
 //
 // Expected requests:
-//   GET {API_BASE_URL}/account/events   -> ManagedEvent[]
-//   GET {API_BASE_URL}/account/joined   -> JoinedEvent[]
+//   GET {NEXT_PUBLIC_API_BASE_URL}/account/events   -> ManagedEvent[]
+//   GET {NEXT_PUBLIC_API_BASE_URL}/account/joined   -> JoinedEvent[]
 //
 // Mutations used by the manage page:
-//   PATCH  {API_BASE_URL}/account/events/{slug}  body: { "status": "published" | "draft" }
-//   DELETE {API_BASE_URL}/account/events/{slug}
+//   PATCH  {NEXT_PUBLIC_API_BASE_URL}/account/events/{slug}  body: { "status": "published" | "draft" }
+//   DELETE {NEXT_PUBLIC_API_BASE_URL}/account/events/{slug}
 //
 // There is no auth yet, so these requests carry no session token. When auth
 // is added, forward the session (for example a cookie) with each request.
 
 import { connection } from "next/server"
 import { apiUrl } from "@/lib/api"
+import { endpoints } from "@/lib/endpoints"
 
 export type ManagedEventStatus = "published" | "draft" | "past" | "cancelled"
 
 export type ManagedEvent = {
   slug: string
   title: string
-  image: string
+  image?: string
   /** ISO 8601 date-time, e.g. "2026-08-26T18:00:00+01:00" */
   startDate: string
   timeZone?: string
@@ -33,7 +35,7 @@ export type ManagedEvent = {
 export type JoinedEvent = {
   slug: string
   title: string
-  image: string
+  image?: string
   /** ISO 8601 date-time, e.g. "2026-08-26T18:00:00+01:00" */
   startDate: string
   timeZone?: string
@@ -58,9 +60,9 @@ async function getList<T>(path: string): Promise<T> {
 }
 
 export function getManagedEvents() {
-  return getList<ManagedEvent[]>("/account/events")
+  return getList<ManagedEvent[]>(endpoints.managedEvents)
 }
 
 export function getJoinedEvents() {
-  return getList<JoinedEvent[]>("/account/joined")
+  return getList<JoinedEvent[]>(endpoints.joinedEvents)
 }

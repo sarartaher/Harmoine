@@ -42,6 +42,23 @@ export function formatEventTime(value: string, timeZone?: string) {
   }).format(date)
 }
 
+/** Small "AUG / 26" badge used on event cards. */
+export function formatDateBadge(value: string, timeZone?: string) {
+  const date = parseDate(value)
+  if (!date) {
+    return { month: "", day: "" }
+  }
+
+  return {
+    month: new Intl.DateTimeFormat("en-US", { month: "short", timeZone })
+      .format(date)
+      .toUpperCase(),
+    day: new Intl.DateTimeFormat("en-US", { day: "numeric", timeZone }).format(
+      date
+    ),
+  }
+}
+
 export function formatEventTimeRange(
   start: string,
   end?: string,

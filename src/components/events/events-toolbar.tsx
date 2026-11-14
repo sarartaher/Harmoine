@@ -3,7 +3,6 @@
 import { Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { eventCategories } from "@/lib/data"
 import { cn } from "@/lib/utils"
 
 export function EventsToolbar({
@@ -11,11 +10,13 @@ export function EventsToolbar({
   onQueryChange,
   category,
   onCategoryChange,
+  categories,
 }: {
   query: string
   onQueryChange: (value: string) => void
   category: string
   onCategoryChange: (value: string) => void
+  categories: string[]
 }) {
   return (
     <div className="flex flex-col gap-4 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm dark:border-violet-900/40 dark:bg-slate-900 lg:flex-row lg:items-center lg:justify-between">
@@ -45,8 +46,12 @@ export function EventsToolbar({
         </Button>
       </form>
 
-      <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by category">
-        {eventCategories.map((value) => {
+      <div
+        className="flex flex-wrap gap-2"
+        role="group"
+        aria-label="Filter by category"
+      >
+        {categories.map((value) => {
           const active = category === value
           return (
             <Button
