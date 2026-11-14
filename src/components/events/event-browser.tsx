@@ -24,7 +24,21 @@ export function EventBrowser() {
 
   // The list is small, so we simply re-filter on every render.
   const search = query.trim().toLowerCase()
-  const filtered = events.filter((event) => {
+
+  // The clock is read in an effect so the page can be prerendered without
+  // an unstable current-time value during render.
+  const [now, setNow] = React.useState<number | null>(null)
+  React.useEffect(() => {
+    setNow(Date.now())
+  }, [])
+
+  // Only upcoming events are shown on this public page.
+  const upcomingEvents = events.filter(
+    (event) =>
+      now === null || new Date(event.startDate).getTime() > now
+  )
+
+  const filtered = upcomingEvents.filter((event) => {
     const matchesSearch =
       search === "" ||
       event.title.toLowerCase().includes(search) ||

@@ -28,10 +28,10 @@ export default function AccountEventsPage() {
         icon={<CalendarDays className="size-6" />}
         action={
           <Link
-            href="/events"
+            href="/account/events/new"
             className="inline-flex h-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-5 text-sm font-semibold text-white shadow-lg shadow-violet-600/25 outline-none transition hover:from-violet-500 hover:to-indigo-500 focus-visible:ring-2 focus-visible:ring-violet-500/50"
           >
-            Browse events
+            Create Event
           </Link>
         }
       />

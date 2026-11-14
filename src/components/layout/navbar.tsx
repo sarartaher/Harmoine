@@ -8,6 +8,7 @@ import {
   HeartHandshake,
   LogOut,
   Menu,
+  Plus,
   Settings,
   Ticket,
   User,
@@ -137,6 +138,9 @@ export function Navbar() {
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuLabel>{displayName}</DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem render={<Link href="/account/events/new" />}>
+                <Plus /> Create Event
+              </DropdownMenuItem>
               <DropdownMenuItem render={<Link href="/account/events" />}>
                 <CalendarDays /> My Events
               </DropdownMenuItem>

@@ -14,13 +14,13 @@ const socials = [
 const discoverLinks = [
   { href: "/", label: "Homepage" },
   { href: "/events", label: "Upcoming Events" },
-  { href: "#", label: "Our Community" },
+  { href: "/events", label: "Our Community" },
 ]
 
 const organizerLinks = [
-  { href: "#", label: "Create Events" },
-  { href: "#", label: "Manage Events" },
-  { href: "#", label: "Join the Community" },
+  { href: "/account/events/new", label: "Create Events" },
+  { href: "/account/events", label: "Manage Events" },
+  { href: "/account/joined", label: "Joined Events" },
 ]
 
 function FooterColumn({

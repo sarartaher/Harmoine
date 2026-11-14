@@ -1,15 +1,20 @@
-// Server actions used by the manage-events page.
+// Server actions used by the manage/create-events pages.
 //
-// They call the backend, then ask Next.js to refresh /account/events so the
-// list is fetched again and the new status (or the deletion) is visible.
+// They call the backend, then ask Next.js to refresh the relevant path so the
+// list is fetched again and shows the new state.
 //
 // There is no auth yet, so these requests carry no session token.
 
 "use server"
 
+import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
 import { apiUrl } from "@/lib/api"
 import { endpoints } from "@/lib/endpoints"
+
+export type EventMutationState =
+  | { ok: true }
+  | { ok: false; error: string }
 
 export async function setManagedEventStatus(formData: FormData) {
   const slug = String(formData.get("slug") ?? "")
@@ -49,4 +54,57 @@ export async function deleteManagedEvent(formData: FormData) {
   }
 
   revalidatePath("/account/events")
+}
+
+// Used by the create-event form. Validates the required fields, asks the
+// backend to create the event, then redirects to /events (the upcoming list).
+export async function createManagedEvent(
+  state: EventMutationState | null,
+  formData: FormData
+): Promise<EventMutationState> {
+  const title = String(formData.get("title") ?? "").trim()
+  const description = String(formData.get("description") ?? "").trim()
+  const category = String(formData.get("category") ?? "").trim()
+  const image = String(formData.get("image") ?? "").trim()
+  const location = String(formData.get("location") ?? "").trim()
+  const startDate = String(formData.get("startDate") ?? "").trim()
+  const status = String(formData.get("status") ?? "draft")
+
+  if (!title || !description || !category || !location || !startDate) {
+    return {
+      ok: false,
+      error:
+        "Please fill in the title, description, category, location and date.",
+    }
+  }
+
+  const start = new Date(startDate)
+  if (Number.isNaN(start.getTime()) || start.getTime() <= Date.now()) {
+    return { ok: false, error: "Event date must be in the future." }
+  }
+
+  if (status !== "draft" && status !== "published") {
+    return { ok: false, error: 'Status must be "draft" or "published".' }
+  }
+
+  const response = await fetch(apiUrl(endpoints.createEvent), {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      title,
+      description,
+      category,
+      image: image || undefined,
+      location,
+      startDate,
+      status,
+    }),
+  })
+
+  if (!response.ok) {
+    return { ok: false, error: `Failed to create event (${response.status})` }
+  }
+
+  revalidatePath("/account/events")
+  redirect("/events")
 }

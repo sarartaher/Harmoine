@@ -25,4 +25,11 @@ export const endpoints = {
   /** Update or delete one managed event: PATCH / DELETE */
   managedEvent: (slug: string) =>
     `/account/events/${encodeURIComponent(slug)}`,
+
+  /** Create a new event: POST /account/events -> ManagedEvent */
+  createEvent: "/account/events",
+
+  /** Join an event: POST /events/{slug}/join */
+  eventJoin: (slug: string) =>
+    `/events/${encodeURIComponent(slug)}/join`,
 }

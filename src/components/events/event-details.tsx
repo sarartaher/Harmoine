@@ -1,4 +1,7 @@
+"use client"
+
 import type { ReactNode } from "react"
+import * as React from "react"
 import Link from "next/link"
 import {
   ArrowLeft,
@@ -11,11 +14,14 @@ import {
   Tag,
   Users,
 } from "lucide-react"
+import { useAppData } from "@/components/providers/app-data-provider"
+import { joinEvent } from "@/app/events/actions"
 import type { EventDetail } from "@/interfaces"
 import {
   formatEventDate,
   formatEventTimeRange,
 } from "@/lib/format-event-date"
+import { Button } from "@/components/ui/button"
 
 function DetailRow({
   icon,
@@ -44,6 +50,19 @@ function DetailRow({
 }
 
 export function EventDetails({ event }: { event: EventDetail }) {
+  const { profile } = useAppData()
+  const [joined, setJoined] = React.useState(false)
+  const [isJoining, startJoin] = React.useTransition()
+
+  function handleJoin() {
+    startJoin(async () => {
+      const result = await joinEvent(event.slug)
+      if (result.ok) {
+        setJoined(true)
+      }
+    })
+  }
+
   const date = formatEventDate(event.startDate, event.timeZone)
   const time = formatEventTimeRange(
     event.startDate,
@@ -235,6 +254,41 @@ export function EventDetails({ event }: { event: EventDetail }) {
                   </DetailRow>
                 ) : null}
               </dl>
+
+              {joined ? (
+                <div className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-center dark:border-emerald-900/40 dark:bg-emerald-500/10">
+                  <p className="font-semibold text-emerald-700 dark:text-emerald-300">
+                    You&apos;re joined!
+                  </p>
+                  <p className="mt-1 text-sm text-emerald-700/80 dark:text-emerald-200/80">
+                    Thanks for volunteering in your community.
+                  </p>
+                  <Link
+                    href="/account/joined"
+                    className="mt-3 inline-flex h-9 items-center justify-center rounded-lg border border-emerald-300 bg-white px-4 text-sm font-medium text-emerald-700 outline-none transition hover:bg-emerald-50 focus-visible:ring-2 focus-visible:ring-emerald-500/50 dark:border-emerald-800 dark:bg-slate-900 dark:text-emerald-300 dark:hover:bg-emerald-500/10"
+                  >
+                    View joined events
+                  </Link>
+                </div>
+              ) : !profile ? (
+                <Link
+                  href="/sign-in"
+                  className="mt-6 inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 px-5 text-base font-medium text-white shadow-lg shadow-violet-600/25 outline-none transition hover:from-violet-500 hover:to-indigo-500 focus-visible:ring-2 focus-visible:ring-violet-500/50"
+                >
+                  Log in to join
+                  <ArrowRight className="size-4" />
+                </Link>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={handleJoin}
+                  disabled={isJoining}
+                  className="mt-6 w-full gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-600/25 hover:from-violet-500 hover:to-indigo-500"
+                >
+                  <Check className="size-4" />
+                  {isJoining ? "Joining..." : "Join Event"}
+                </Button>
+              )}
 
               {event.registrationUrl ? (
                 <a

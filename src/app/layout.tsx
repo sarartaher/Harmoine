@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ToastContainer, toast } from "react-toastify";
 import { Geist } from "next/font/google";
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full" suppressHydrationWarning>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <AppDataProvider>
+          <ToastContainer />
           <Navbar />
           {children}
           <Footer />
