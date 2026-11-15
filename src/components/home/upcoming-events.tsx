@@ -17,16 +17,16 @@ import { EventImage } from "@/components/shared/event-image";
 import { EmptyState } from "@/components/shared/empty-state";
 
 function EventCard({ event }: { event: EventSummary }) {
-  const { month, day } = formatDateBadge(event.startDate, event.timeZone);
+  const { month, day } = formatDateBadge(event.eventDate);
 
   return (
     <Link
-      href={`/events/${event.slug}`}
+      href={`/events/${event._id}`}
       className="group block h-full overflow-hidden rounded-2xl border border-violet-100 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl dark:border-violet-900/40 dark:bg-slate-900"
     >
       <div className="relative aspect-[4/3] overflow-hidden">
         <EventImage
-          src={event.image}
+          src={event.thumbnail}
           alt={event.title}
           className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
         />
@@ -70,7 +70,7 @@ export function UpcomingEvents() {
             <CarouselContent>
               {recentEvents.map((event) => (
                 <CarouselItem
-                  key={event.slug}
+                  key={event._id}
                   className="basis-full sm:basis-1/2 lg:basis-1/3"
                 >
                   <EventCard event={event} />

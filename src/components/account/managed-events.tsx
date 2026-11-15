@@ -83,7 +83,7 @@ function EventActions({ event }: { event: ManagedEvent }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <Link
-        href={`/events/${event.slug}`}
+        href={`/events/${event._id}`}
         className="inline-flex h-7 items-center rounded-lg border border-border bg-background px-2.5 text-sm font-medium text-foreground outline-none transition hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 dark:border-input dark:bg-input/30 dark:hover:bg-input/50"
       >
         View
@@ -91,7 +91,7 @@ function EventActions({ event }: { event: ManagedEvent }) {
 
       {event.status === "published" ? (
         <form action={setManagedEventStatus}>
-          <input type="hidden" name="slug" value={event.slug} />
+          <input type="hidden" name="slug" value={event._id} />
           <input type="hidden" name="status" value="draft" />
           <SubmitButton label="Unpublish" pendingLabel="Saving..." />
         </form>
@@ -99,7 +99,7 @@ function EventActions({ event }: { event: ManagedEvent }) {
 
       {event.status === "draft" ? (
         <form action={setManagedEventStatus}>
-          <input type="hidden" name="slug" value={event.slug} />
+          <input type="hidden" name="slug" value={event._id} />
           <input type="hidden" name="status" value="published" />
           <SubmitButton label="Publish" pendingLabel="Saving..." />
         </form>
@@ -116,7 +116,7 @@ function EventActions({ event }: { event: ManagedEvent }) {
           }
         }}
       >
-        <input type="hidden" name="slug" value={event.slug} />
+        <input type="hidden" name="slug" value={event._id} />
         <SubmitButton
           label="Delete"
           pendingLabel="Deleting..."
@@ -210,13 +210,13 @@ export function ManagedEvents({ events }: { events: ManagedEvent[] }) {
             <tbody className="divide-y divide-violet-100 dark:divide-violet-900/40">
               {filtered.map((event) => (
                 <tr
-                  key={event.slug}
+                  key={event._id}
                   className="transition hover:bg-violet-50/40 dark:hover:bg-violet-950/20"
                 >
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       <EventImage
-                        src={event.image}
+                        src={event.thumbnail}
                         alt=""
                         iconClassName="size-5"
                         className="size-12 shrink-0 rounded-lg object-cover"
@@ -226,13 +226,13 @@ export function ManagedEvents({ events }: { events: ManagedEvent[] }) {
                           {event.title}
                         </p>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                          {event.category}
+                          {event.eventType}
                         </p>
                       </div>
                     </div>
                   </td>
                   <td className="px-5 py-4 text-slate-600 dark:text-slate-300">
-                    {formatEventDateShort(event.startDate, event.timeZone)}
+                    {formatEventDateShort(event.eventDate, event.timeZone)}
                   </td>
                   <td className="px-5 py-4 text-slate-600 dark:text-slate-300">
                     {event.location}
@@ -256,10 +256,10 @@ export function ManagedEvents({ events }: { events: ManagedEvent[] }) {
           {/* Mobile cards */}
           <div className="divide-y divide-violet-100 md:hidden dark:divide-violet-900/40">
             {filtered.map((event) => (
-              <div key={event.slug} className="space-y-4 p-4">
+              <div key={event._id} className="space-y-4 p-4">
                 <div className="flex items-start gap-3">
                   <EventImage
-                    src={event.image}
+                    src={event.thumbnail}
                     alt=""
                     iconClassName="size-7"
                     className="size-16 shrink-0 rounded-xl object-cover"
@@ -269,7 +269,7 @@ export function ManagedEvents({ events }: { events: ManagedEvent[] }) {
                       {event.title}
                     </p>
                     <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
-                      {formatEventDateShort(event.startDate, event.timeZone)}
+                      {formatEventDateShort(event.eventDate, event.timeZone)}
                     </p>
                     <p className="text-sm text-slate-500 dark:text-slate-400">
                       {event.location}
@@ -279,7 +279,7 @@ export function ManagedEvents({ events }: { events: ManagedEvent[] }) {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                  <span>{event.category}</span>
+                  <span>{event.eventType}</span>
                   <span aria-hidden>·</span>
                   <span>{attendeesText(event)} attendees</span>
                 </div>

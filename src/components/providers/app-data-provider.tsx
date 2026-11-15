@@ -2,10 +2,8 @@
 
 import * as React from "react";
 import type {
-  AccountProfile,
   AppData,
   EventSummary,
-  GalleryImage,
 } from "@/interfaces";
 import { apiUrl } from "@/lib/api";
 import { endpoints } from "@/lib/endpoints";
@@ -30,18 +28,9 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
     async function loadData() {
       try {
         // Get data from the backend
-        const [
-          eventsResponse,
-          recentEventsResponse,
-          categoriesResponse,
-          galleryResponse,
-          profileResponse,
-        ] = await Promise.all([
+        const [eventsResponse, recentEventsResponse] = await Promise.all([
           fetch(apiUrl(endpoints.events)),
           fetch(apiUrl(endpoints.recentEvents)),
-          fetch(apiUrl(endpoints.categories)),
-          fetch(apiUrl(endpoints.gallery)),
-          fetch(apiUrl(endpoints.profile)),
         ]);
 
         // Convert the responses into JavaScript data
@@ -53,25 +42,19 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
           ? await recentEventsResponse.json()
           : [];
 
-        const categories: string[] = categoriesResponse.ok
-          ? await categoriesResponse.json()
-          : [];
-
-        const gallery: GalleryImage[] = galleryResponse.ok
-          ? await galleryResponse.json()
-          : [];
-
-        const profile: AccountProfile | null = profileResponse.ok
-          ? await profileResponse.json()
-          : null;
+        // Categories come from the unique event types in the events list
+        // (the backend has no dedicated categories endpoint).
+        const categories: string[] = [
+          ...new Set(events.map((e) => e.eventType).filter(Boolean)),
+        ];
 
         // Save all the data in React state
         setData({
           events,
           recentEvents,
           categories,
-          gallery,
-          profile,
+          gallery: [],
+          profile: null,
           loading: false,
         });
       } catch (error) {

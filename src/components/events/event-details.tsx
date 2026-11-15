@@ -56,18 +56,17 @@ export function EventDetails({ event }: { event: EventDetail }) {
 
   function handleJoin() {
     startJoin(async () => {
-      const result = await joinEvent(event.slug)
+      const result = await joinEvent(event._id)
       if (result.ok) {
         setJoined(true)
       }
     })
   }
 
-  const date = formatEventDate(event.startDate, event.timeZone)
+  const date = formatEventDate(event.eventDate)
   const time = formatEventTimeRange(
-    event.startDate,
-    event.endDate,
-    event.timeZone
+    event.eventDate,
+    event.endDate
   )
 
   let spotsText: string | null = null
@@ -89,11 +88,11 @@ export function EventDetails({ event }: { event: EventDetail }) {
   return (
     <main className="flex-1 bg-slate-50 dark:bg-slate-950">
       <header className="relative isolate overflow-hidden bg-slate-900">
-        {event.image ? (
+        {event.thumbnail ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element -- backend image URL; swap for next/image if the host is configured */}
             <img
-              src={event.image}
+              src={event.thumbnail}
               alt=""
               className="absolute inset-0 -z-20 h-full w-full object-cover"
             />
@@ -116,7 +115,7 @@ export function EventDetails({ event }: { event: EventDetail }) {
           <div className="mt-8 max-w-3xl">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold tracking-wide text-white backdrop-blur">
               <Tag className="size-3.5" />
-              {event.category}
+              {event.eventType}
             </span>
 
             <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">

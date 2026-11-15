@@ -15,28 +15,28 @@ export type ManagedEventsFilter = "all" | ManagedEventStatus
 export type JoinedEventsTab = "all" | "upcoming" | "past"
 
 export interface ManagedEvent {
-  slug: string
+  _id: string
   title: string
-  image?: string
-  /** ISO 8601 date-time, e.g. "2026-08-26T18:00:00+01:00" */
-  startDate: string
+  thumbnail?: string
+  /** ISO 8601 date-time */
+  eventDate: string
   timeZone?: string
   location: string
-  category: string
+  eventType: string
   status: ManagedEventStatus
   attendees?: number
   capacity?: number
 }
 
 export interface JoinedEvent {
-  slug: string
+  _id: string
   title: string
-  image?: string
-  /** ISO 8601 date-time, e.g. "2026-08-26T18:00:00+01:00" */
-  startDate: string
+  thumbnail?: string
+  /** ISO 8601 date-time */
+  eventDate: string
   timeZone?: string
   location: string
-  category: string
+  eventType: string
   /** ISO 8601 date-time for when the user joined. */
   joinedAt?: string
 }

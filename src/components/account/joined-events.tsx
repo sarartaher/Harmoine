@@ -19,7 +19,7 @@ function tabLabel(tab: JoinedEventsTab) {
 }
 
 function isPast(event: JoinedEvent, now: number) {
-  const start = new Date(event.startDate).getTime()
+  const start = new Date(event.eventDate).getTime()
   return !Number.isNaN(start) && start < now
 }
 
@@ -90,18 +90,18 @@ export function JoinedEvents({ events }: { events: JoinedEvent[] }) {
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((event) => (
             <Link
-              key={event.slug}
-              href={`/events/${event.slug}`}
+              key={event._id}
+              href={`/events/${event._id}`}
               className="group flex h-full flex-col overflow-hidden rounded-2xl border border-violet-100 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl dark:border-violet-900/40 dark:bg-slate-900"
             >
               <div className="relative aspect-[16/10] overflow-hidden">
                 <EventImage
-                  src={event.image}
+                  src={event.thumbnail}
                   alt={event.title}
                   className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                 />
                 <span className="absolute top-3 left-3 rounded-lg bg-white px-2.5 py-1 text-xs font-semibold text-violet-700 shadow-md dark:bg-slate-900 dark:text-violet-300">
-                  {formatEventDateShort(event.startDate, event.timeZone)}
+                  {formatEventDateShort(event.eventDate, event.timeZone)}
                 </span>
                 {isPast(event, now) ? (
                   <span className="absolute top-3 right-3 rounded-full bg-slate-900/80 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur">
@@ -113,7 +113,7 @@ export function JoinedEvents({ events }: { events: JoinedEvent[] }) {
               <div className="flex flex-1 flex-col gap-2 p-4">
                 <span className="flex items-center gap-1.5 text-xs font-semibold tracking-wide text-violet-600 uppercase dark:text-violet-300">
                   <Tag className="size-3.5" />
-                  {event.category}
+                  {event.eventType}
                 </span>
 
                 <h2 className="font-semibold text-slate-900 dark:text-white">

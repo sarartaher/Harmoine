@@ -29,7 +29,7 @@ export async function generateMetadata({
     openGraph: {
       title: event.title,
       description,
-      images: event.image ? [{ url: event.image }] : undefined,
+      images: event.thumbnail ? [{ url: event.thumbnail }] : undefined,
     },
   }
 }

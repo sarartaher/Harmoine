@@ -9,14 +9,14 @@ import { formatDateBadge } from "@/lib/format-event-date"
 import { cn } from "@/lib/utils"
 
 export function EventCard({ event }: { event: EventSummary }) {
-  const { month, day } = formatDateBadge(event.startDate, event.timeZone)
+  const { month, day } = formatDateBadge(event.eventDate)
   const [favorite, setFavorite] = React.useState(false)
 
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-violet-100 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl dark:border-violet-900/40 dark:bg-slate-900">
       <div className="relative aspect-[4/3] overflow-hidden">
         <EventImage
-          src={event.image}
+          src={event.thumbnail}
           alt={event.title}
           className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
         />
@@ -58,10 +58,10 @@ export function EventCard({ event }: { event: EventSummary }) {
         <div className="mt-auto flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2 dark:bg-slate-800/60">
           <span className="flex items-center gap-1.5 text-sm font-medium text-slate-600 dark:text-slate-300">
             <Tag className="size-4 text-violet-600 dark:text-violet-400" />
-            {event.category}
+            {event.eventType}
           </span>
           <Link
-            href={`/events/${event.slug}`}
+            href={`/events/${event._id}`}
             aria-label={`View ${event.title}`}
             className="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-md transition hover:from-violet-400 hover:to-indigo-500"
           >

@@ -1,16 +1,18 @@
 // Shapes shared by the event pages and the global data context.
-// Adjust these to match what your backend returns.
+// These match the real backend's response shape (MongoDB _id, eventType,
+// eventDate, thumbnail). Adjust if your backend returns different fields.
 
 export interface EventSummary {
-  slug: string
+  /** MongoDB document id, used as the URL slug. */
+  _id: string
   title: string
-  /** ISO 8601 date-time, e.g. "2026-08-26T18:00:00+01:00" */
-  startDate: string
-  /** IANA time zone for display, e.g. "Europe/London". */
-  timeZone?: string
+  /** ISO 8601 date-time, e.g. "2026-11-22T10:00:00.000Z" */
+  eventDate: string
   location: string
-  category: string
-  image?: string
+  eventType: string
+  thumbnail?: string
+  description?: string
+  createdByEmail?: string
 }
 
 // Helper shapes used inside EventDetail.
@@ -41,19 +43,20 @@ export interface EventDetail extends EventSummary {
   registrationUrl?: string
 }
 
-/** Route props for `/events/[slug]`. */
+/**
+ * Route props for `/events/[slug]`. The param is the event's `_id`.
+ */
 export type EventPageProps = {
   params: Promise<{ slug: string }>
 }
 
-/** Fields used by the create-event form (all required except image). */
+/** Fields used by the create-event form. */
 export interface CreateEventInput {
   title: string
   description: string
-  category: string
-  image?: string
+  eventType: string
+  thumbnail?: string
   location: string
-  /** ISO 8601 date-time in the future, e.g. "2026-12-01T18:00:00+01:00". */
-  startDate: string
-  status: "draft" | "published"
+  /** ISO 8601 date-time in the future. */
+  eventDate: string
 }

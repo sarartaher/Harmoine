@@ -64,27 +64,22 @@ export async function createManagedEvent(
 ): Promise<EventMutationState> {
   const title = String(formData.get("title") ?? "").trim()
   const description = String(formData.get("description") ?? "").trim()
-  const category = String(formData.get("category") ?? "").trim()
-  const image = String(formData.get("image") ?? "").trim()
+  const eventType = String(formData.get("category") ?? "").trim()
+  const thumbnail = String(formData.get("image") ?? "").trim()
   const location = String(formData.get("location") ?? "").trim()
-  const startDate = String(formData.get("startDate") ?? "").trim()
-  const status = String(formData.get("status") ?? "draft")
+  const eventDate = String(formData.get("startDate") ?? "").trim()
 
-  if (!title || !description || !category || !location || !startDate) {
+  if (!title || !description || !eventType || !location || !eventDate) {
     return {
       ok: false,
       error:
-        "Please fill in the title, description, category, location and date.",
+        "Please fill in the title, description, event type, location and date.",
     }
   }
 
-  const start = new Date(startDate)
+  const start = new Date(eventDate)
   if (Number.isNaN(start.getTime()) || start.getTime() <= Date.now()) {
     return { ok: false, error: "Event date must be in the future." }
-  }
-
-  if (status !== "draft" && status !== "published") {
-    return { ok: false, error: 'Status must be "draft" or "published".' }
   }
 
   const response = await fetch(apiUrl(endpoints.createEvent), {
@@ -93,11 +88,10 @@ export async function createManagedEvent(
     body: JSON.stringify({
       title,
       description,
-      category,
-      image: image || undefined,
+      eventType,
+      thumbnail: thumbnail || undefined,
       location,
-      startDate,
-      status,
+      eventDate,
     }),
   })
 
@@ -105,6 +99,6 @@ export async function createManagedEvent(
     return { ok: false, error: `Failed to create event (${response.status})` }
   }
 
-  revalidatePath("/account/events")
+  revalidatePath("/events")
   redirect("/events")
 }

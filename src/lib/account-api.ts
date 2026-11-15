@@ -24,6 +24,11 @@ async function getList<T>(path: string): Promise<T> {
 
   const response = await fetch(apiUrl(path), { cache: "no-store" })
 
+  // The backend may not have these endpoints yet — treat 404 as "no data".
+  if (response.status === 404) {
+    return [] as unknown as T
+  }
+
   if (!response.ok) {
     throw new Error(`Failed to load ${path} (${response.status})`)
   }

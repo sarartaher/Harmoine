@@ -45,7 +45,7 @@ export function EventBrowser() {
   // Only upcoming events are shown on this public page.
   const upcomingEvents = events.filter(
     (event) =>
-      now === null || new Date(event.startDate).getTime() > now
+      now === null || new Date(event.eventDate).getTime() > now
   )
 
   const filtered = upcomingEvents.filter((event) => {
@@ -55,7 +55,7 @@ export function EventBrowser() {
       event.location.toLowerCase().includes(search)
 
     const matchesCategory =
-      category === "All" || event.category === category
+      category === "All" || event.eventType === category
 
     return matchesSearch && matchesCategory
   })
@@ -90,7 +90,7 @@ export function EventBrowser() {
         {pageItems.length > 0 ? (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {pageItems.map((event) => (
-              <EventCard key={event.slug} event={event} />
+              <EventCard key={event._id} event={event} />
             ))}
           </div>
         ) : (
