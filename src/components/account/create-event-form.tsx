@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useActionState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useAppData } from "@/components/providers/app-data-provider"
@@ -24,6 +25,7 @@ const textareaClass =
  */
 export function CreateEventForm() {
   const { categories, loading } = useAppData()
+  const router = useRouter()
   const [state, formAction, isPending] = useActionState(createManagedEvent, null)
 
   const error = state?.ok === false ? state.error : null
@@ -31,8 +33,9 @@ export function CreateEventForm() {
   React.useEffect(() => {
     if (state?.ok) {
       toast.success("Event created successfully!")
+      router.push("/events")
     }
-  }, [state])
+  }, [state, router])
 
   const categoryOptions =
     categories.length > 0 ? categories : ["Cleanup", "Plantation", "Donation"]

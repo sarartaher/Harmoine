@@ -2,8 +2,6 @@ import type { Metadata } from "next"
 import { Suspense } from "react"
 import Link from "next/link"
 import { Ticket } from "lucide-react"
-import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
 import { AccountHeader } from "@/components/account/account-header"
 import { JoinedEvents } from "@/components/account/joined-events"
 import { EmptyState } from "@/components/shared/empty-state"
@@ -16,16 +14,8 @@ export const metadata: Metadata = {
 
 // Cache Components requires runtime data to be read inside <Suspense>.
 async function JoinedEventsContent() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  })
-  const email = session?.user?.email
+  const events = await getJoinedEvents()
 
-  if (!email) {
-    return <JoinedEvents events={[]} />
-  }
-
-  const events = await getJoinedEvents(email)
   return <JoinedEvents events={events} />
 }
 

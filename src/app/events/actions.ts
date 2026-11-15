@@ -11,6 +11,18 @@ import { auth } from "@/lib/auth"
 import { apiUrl } from "@/lib/api"
 import { endpoints } from "@/lib/endpoints"
 
+// Helper: get auth headers with Bearer token from session
+async function getAuthHeaders(): Promise<Record<string, string>> {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
+  const token = session?.session?.token
+  if (token) {
+    return { Authorization: `Bearer ${token}` }
+  }
+  return {}
+}
+
 export type JoinEventState = { ok: true } | { ok: false; error: string }
 
 export async function joinEvent(slug: string): Promise<JoinEventState> {
@@ -27,17 +39,13 @@ export async function joinEvent(slug: string): Promise<JoinEventState> {
     return { ok: false, error: "You must be logged in to join an event." }
   }
 
-  const userEmail = session.user.email
-  if (!userEmail) {
-    return { ok: false, error: "Could not determine your email." }
-  }
-
   let response: Response
   try {
+    const authHeaders = await getAuthHeaders()
     response = await fetch(apiUrl(endpoints.eventJoin(slug)), {
       method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email: userEmail }),
+      headers: { "content-type": "application/json", ...authHeaders },
+      body: JSON.stringify({}),
     })
   } catch {
     return { ok: false, error: "Could not reach the server. Please try again." }

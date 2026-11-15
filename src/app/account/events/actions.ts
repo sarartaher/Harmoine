@@ -3,7 +3,7 @@
 // They call the backend, then ask Next.js to refresh the relevant path so the
 // list is fetched again and shows the new state.
 //
-// There is no auth yet, so these requests carry no session token.
+// Auth: Bearer token from Better Auth session is forwarded.
 
 "use server"
 
@@ -13,6 +13,7 @@ import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
 import { apiUrl } from "@/lib/api"
 import { endpoints } from "@/lib/endpoints"
+import { getAuthHeaders } from "@/lib/account-auth"
 
 export type EventMutationState =
   | { ok: true }
@@ -29,7 +30,7 @@ export async function setManagedEventStatus(formData: FormData) {
 
   const response = await fetch(apiUrl(endpoints.managedEvent(slug)), {
     method: "PATCH",
-    headers: { "content-type": "application/json" },
+    headers: { "content-type": "application/json", ...await getAuthHeaders() },
     body: JSON.stringify({ status }),
   })
 
@@ -49,6 +50,7 @@ export async function deleteManagedEvent(formData: FormData) {
 
   const response = await fetch(apiUrl(endpoints.managedEvent(slug)), {
     method: "DELETE",
+    headers: await getAuthHeaders(),
   })
 
   if (!response.ok) {
@@ -102,8 +104,10 @@ export async function updateManagedEvent(
 
   let response: Response
   try {
+    const authHeaders = await getAuthHeaders()
     response = await fetch(apiUrl(endpoints.managedEvent(id)), {
       method: "PATCH",
+      headers: authHeaders,
       body: uploadData,
     })
   } catch {
@@ -169,8 +173,10 @@ export async function createManagedEvent(
 
   let response: Response
   try {
+    const authHeaders = await getAuthHeaders()
     response = await fetch(apiUrl(endpoints.createEvent), {
       method: "POST",
+      headers: authHeaders,
       body: uploadData,
     })
   } catch (err) {
@@ -185,5 +191,5 @@ export async function createManagedEvent(
   }
 
   revalidatePath("/events")
-  redirect("/events")
+  return { ok: true }
 }

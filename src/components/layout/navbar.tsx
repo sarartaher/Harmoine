@@ -10,6 +10,7 @@ import {
   Menu,
   Plus,
   Ticket,
+  UserRound,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -172,6 +173,13 @@ export function Navbar() {
 
                 <DropdownMenuGroup>
                   <DropdownMenuItem
+                    render={<Link href="/account/profile" />}
+                  >
+                    <UserRound />
+                    My Profile
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem
                     render={<Link href="/account/events/new" />}
                   >
                     <Plus />
@@ -247,6 +255,12 @@ export function Navbar() {
                       href="/account/events/new"
                       label="Create Event"
                       active={pathname === "/account/events/new"}
+                      layout="vertical"
+                    />
+                    <NavLink
+                      href="/account/profile"
+                      label="My Profile"
+                      active={pathname === "/account/profile"}
                       layout="vertical"
                     />
 
