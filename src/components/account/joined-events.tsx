@@ -2,11 +2,12 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { ArrowUpRight, CalendarX2, MapPin, Search, Tag } from "lucide-react"
+import { ArrowUpRight, MapPin, Search, Tag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { JoinedEvent, JoinedEventsTab } from "@/interfaces"
 import { EventImage } from "@/components/shared/event-image"
+import { EmptyState } from "@/components/shared/empty-state"
 import { formatEventDateShort } from "@/lib/format-event-date"
 import { cn } from "@/lib/utils"
 
@@ -140,15 +141,7 @@ export function JoinedEvents({ events }: { events: JoinedEvent[] }) {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-violet-200 bg-white py-16 text-center dark:border-violet-900/50 dark:bg-slate-900">
-          <CalendarX2 className="size-10 text-violet-400" />
-          <p className="font-medium text-slate-900 dark:text-white">
-            No joined events found
-          </p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Join an event and it will show up here.
-          </p>
-        </div>
+        <EmptyState message="Join an event and it will show up here." />
       )}
     </div>
   )

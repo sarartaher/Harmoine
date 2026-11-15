@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/carousel"
 import { formatDateBadge } from "@/lib/format-event-date"
 import { EventImage } from "@/components/shared/event-image"
+import { EmptyState } from "@/components/shared/empty-state"
 
 function EventCard({ event }: { event: EventSummary }) {
   const { month, day } = formatDateBadge(event.startDate, event.timeZone)
@@ -51,22 +52,8 @@ function EventCard({ event }: { event: EventSummary }) {
   )
 }
 
-const skeletonCards = [1, 2, 3]
-
-function EventCardSkeleton() {
-  return (
-    <div className="overflow-hidden rounded-2xl border border-violet-100 bg-white shadow-sm dark:border-violet-900/40 dark:bg-slate-900">
-      <div className="aspect-[4/3] animate-pulse bg-slate-200 dark:bg-slate-800" />
-      <div className="space-y-3 p-4">
-        <div className="h-4 w-3/4 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-        <div className="h-3 w-1/2 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
-      </div>
-    </div>
-  )
-}
-
 export function UpcomingEvents() {
-  const { events, loading } = useAppData()
+  const { events } = useAppData()
   const upcoming = events.slice(0, 6)
 
   return (
@@ -74,17 +61,7 @@ export function UpcomingEvents() {
       <div className="mx-auto max-w-7xl px-6">
         <SectionHeading title="Upcoming Events" />
 
-        {loading ? (
-          <div
-            className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-            aria-busy="true"
-            aria-label="Loading upcoming events"
-          >
-            {skeletonCards.map((item) => (
-              <EventCardSkeleton key={item} />
-            ))}
-          </div>
-        ) : upcoming.length > 0 ? (
+        {upcoming.length > 0 ? (
           <Carousel opts={{ align: "start", loop: true }} className="mt-12">
             <CarouselContent>
               {upcoming.map((event) => (
@@ -100,14 +77,10 @@ export function UpcomingEvents() {
             <CarouselNext className="-right-2 size-9 bg-white shadow-md sm:-right-4 dark:bg-slate-800" />
           </Carousel>
         ) : (
-          <div className="mt-12 rounded-2xl border border-dashed border-violet-200 bg-white py-14 text-center dark:border-violet-900/50 dark:bg-slate-900">
-            <p className="font-medium text-slate-900 dark:text-white">
-              No upcoming events yet
-            </p>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-              Events from your backend will appear here.
-            </p>
-          </div>
+          <EmptyState
+            className="mt-12"
+            message="Events from your backend will appear here."
+          />
         )}
 
         <div className="mt-10 flex justify-center">

@@ -1,18 +1,20 @@
 "use client"
 
 import * as React from "react"
-import { SearchX } from "lucide-react"
 import { useAppData } from "@/components/providers/app-data-provider"
 import { EventCard } from "@/components/events/event-card"
 import { EventsHeader } from "@/components/events/events-header"
 import { EventsPagination } from "@/components/events/events-pagination"
 import { EventsToolbar } from "@/components/events/events-toolbar"
+import { EmptyState } from "@/components/shared/empty-state"
 
 const PAGE_SIZE = 6
-const skeletonCards = [1, 2, 3, 4, 5, 6]
+
+// Cached on the client so the snapshot always returns the same value.
+let clientNow: number | null = null
 
 export function EventBrowser() {
-  const { events, categories, loading } = useAppData()
+  const { events, categories } = useAppData()
   const [query, setQuery] = React.useState("")
   const [category, setCategory] = React.useState("All")
   const [page, setPage] = React.useState(1)
@@ -25,12 +27,20 @@ export function EventBrowser() {
   // The list is small, so we simply re-filter on every render.
   const search = query.trim().toLowerCase()
 
-  // The clock is read in an effect so the page can be prerendered without
-  // an unstable current-time value during render.
-  const [now, setNow] = React.useState<number | null>(null)
-  React.useEffect(() => {
-    setNow(Date.now())
-  }, [])
+  // Reading the clock during render would break prerendering, so the
+  // current time is read lazily on the client via useSyncExternalStore.
+  // The server snapshot (null) means "no time yet", which keeps the
+  // prerendered HTML stable; after hydration the list filters to upcoming.
+  const now = React.useSyncExternalStore(
+    () => () => {},
+    () => {
+      if (clientNow === null) {
+        clientNow = Date.now()
+      }
+      return clientNow
+    },
+    () => null
+  )
 
   // Only upcoming events are shown on this public page.
   const upcomingEvents = events.filter(
@@ -77,31 +87,14 @@ export function EventBrowser() {
           categories={categoryFilters}
         />
 
-        {loading ? (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {skeletonCards.map((item) => (
-              <div
-                key={item}
-                className="h-80 animate-pulse rounded-2xl bg-white dark:bg-slate-900"
-              />
-            ))}
-          </div>
-        ) : pageItems.length > 0 ? (
+        {pageItems.length > 0 ? (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {pageItems.map((event) => (
               <EventCard key={event.slug} event={event} />
             ))}
           </div>
         ) : (
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-violet-200 bg-white py-16 text-center dark:border-violet-900/50 dark:bg-slate-900">
-            <SearchX className="size-10 text-violet-400" />
-            <p className="font-medium text-slate-900 dark:text-white">
-              No events found
-            </p>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              Try a different search or category.
-            </p>
-          </div>
+          <EmptyState className="mt-8" message="Try a different search or category." />
         )}
 
         {pageCount > 1 && (

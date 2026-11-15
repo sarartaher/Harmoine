@@ -2,7 +2,7 @@ import { Suspense } from "react"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { EventDetails } from "@/components/events/event-details"
-import { EventDetailsSkeleton } from "@/components/events/event-details-skeleton"
+import { EmptyState } from "@/components/shared/empty-state"
 import type { EventPageProps } from "@/interfaces"
 import { getEventBySlug } from "@/lib/events-api"
 
@@ -48,7 +48,7 @@ async function EventDetailsContent({ params }: EventPageProps) {
 
 export default function EventPage({ params }: EventPageProps) {
   return (
-    <Suspense fallback={<EventDetailsSkeleton />}>
+    <Suspense fallback={<EmptyState />}>
       <EventDetailsContent params={params} />
     </Suspense>
   )

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Search, SearchX } from "lucide-react"
+import { Search } from "lucide-react"
 import { useFormStatus } from "react-dom"
 import {
   deleteManagedEvent,
@@ -16,6 +16,7 @@ import type {
   ManagedEventsFilter,
 } from "@/interfaces"
 import { EventImage } from "@/components/shared/event-image"
+import { EmptyState } from "@/components/shared/empty-state"
 import { formatEventDateShort } from "@/lib/format-event-date"
 import { cn } from "@/lib/utils"
 
@@ -289,15 +290,7 @@ export function ManagedEvents({ events }: { events: ManagedEvent[] }) {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-violet-200 bg-white py-16 text-center dark:border-violet-900/50 dark:bg-slate-900">
-          <SearchX className="size-10 text-violet-400" />
-          <p className="font-medium text-slate-900 dark:text-white">
-            No events found
-          </p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Try a different search or status.
-          </p>
-        </div>
+        <EmptyState message="Try a different search or status." />
       )}
     </div>
   )

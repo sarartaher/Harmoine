@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Ticket } from "lucide-react"
 import { AccountHeader } from "@/components/account/account-header"
 import { JoinedEvents } from "@/components/account/joined-events"
-import { JoinedEventsSkeleton } from "@/components/account/joined-events-skeleton"
+import { EmptyState } from "@/components/shared/empty-state"
 import { getJoinedEvents } from "@/lib/account-api"
 
 export const metadata: Metadata = {
@@ -37,7 +37,7 @@ export default function AccountJoinedPage() {
       />
 
       <div className="mx-auto max-w-7xl px-6 py-8">
-        <Suspense fallback={<JoinedEventsSkeleton />}>
+        <Suspense fallback={<EmptyState />}>
           <JoinedEventsContent />
         </Suspense>
       </div>

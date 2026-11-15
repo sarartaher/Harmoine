@@ -4,7 +4,7 @@ import Link from "next/link"
 import { CalendarDays } from "lucide-react"
 import { AccountHeader } from "@/components/account/account-header"
 import { ManagedEvents } from "@/components/account/managed-events"
-import { ManagedEventsSkeleton } from "@/components/account/managed-events-skeleton"
+import { EmptyState } from "@/components/shared/empty-state"
 import { getManagedEvents } from "@/lib/account-api"
 
 export const metadata: Metadata = {
@@ -37,7 +37,7 @@ export default function AccountEventsPage() {
       />
 
       <div className="mx-auto max-w-7xl px-6 py-8">
-        <Suspense fallback={<ManagedEventsSkeleton />}>
+        <Suspense fallback={<EmptyState />}>
           <ManagedEventsContent />
         </Suspense>
       </div>
