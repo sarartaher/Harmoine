@@ -14,8 +14,9 @@ import {
   Tag,
   Users,
 } from "lucide-react"
-import { useAppData } from "@/components/providers/app-data-provider"
 import { joinEvent } from "@/app/events/actions"
+import { authClient } from "@/lib/auth-client"
+import { toast } from "react-toastify"
 import type { EventDetail } from "@/interfaces"
 import {
   formatEventDate,
@@ -50,15 +51,20 @@ function DetailRow({
 }
 
 export function EventDetails({ event }: { event: EventDetail }) {
-  const { profile } = useAppData()
+  const { data: session } = authClient.useSession()
   const [joined, setJoined] = React.useState(false)
   const [isJoining, startJoin] = React.useTransition()
+
+  const isLoggedIn = !!session?.user
 
   function handleJoin() {
     startJoin(async () => {
       const result = await joinEvent(event._id)
       if (result.ok) {
         setJoined(true)
+        toast.success("Joined event successfully!")
+      } else {
+        toast.error(result.error)
       }
     })
   }
@@ -269,7 +275,7 @@ export function EventDetails({ event }: { event: EventDetail }) {
                     View joined events
                   </Link>
                 </div>
-              ) : !profile ? (
+              ) : !isLoggedIn ? (
                 <Link
                   href="/sign-in"
                   className="mt-6 inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 px-5 text-base font-medium text-white shadow-lg shadow-violet-600/25 outline-none transition hover:from-violet-500 hover:to-indigo-500 focus-visible:ring-2 focus-visible:ring-violet-500/50"

@@ -8,6 +8,7 @@ import { GithubIcon, GoogleIcon } from "@/components/auth/auth-icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "react-toastify";
 
 export function SignInForm() {
   const router = useRouter();
@@ -52,10 +53,11 @@ export function SignInForm() {
         setError(loginError.message || "Invalid email or password.");
       } else {
         // Login successful
+        toast.success("Logged in successfully!");
         router.push("/");
         router.refresh();
       }
-    } catch (error) {
+    } catch {
       setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);

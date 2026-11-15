@@ -65,9 +65,9 @@ export async function createManagedEvent(
   const title = String(formData.get("title") ?? "").trim()
   const description = String(formData.get("description") ?? "").trim()
   const eventType = String(formData.get("category") ?? "").trim()
-  const thumbnail = String(formData.get("image") ?? "").trim()
   const location = String(formData.get("location") ?? "").trim()
   const eventDate = String(formData.get("startDate") ?? "").trim()
+  const thumbnailFile = formData.get("thumbnail") as File | null
 
   if (!title || !description || !eventType || !location || !eventDate) {
     return {
@@ -82,18 +82,26 @@ export async function createManagedEvent(
     return { ok: false, error: "Event date must be in the future." }
   }
 
-  const response = await fetch(apiUrl(endpoints.createEvent), {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      title,
-      description,
-      eventType,
-      thumbnail: thumbnail || undefined,
-      location,
-      eventDate,
-    }),
-  })
+  // Build FormData for multipart upload (supports file)
+  const uploadData = new FormData()
+  uploadData.append("title", title)
+  uploadData.append("description", description)
+  uploadData.append("eventType", eventType)
+  uploadData.append("location", location)
+  uploadData.append("eventDate", eventDate)
+  if (thumbnailFile && thumbnailFile.size > 0) {
+    uploadData.append("thumbnail", thumbnailFile)
+  }
+
+  let response: Response
+  try {
+    response = await fetch(apiUrl(endpoints.createEvent), {
+      method: "POST",
+      body: uploadData,
+    })
+  } catch {
+    return { ok: false, error: "Could not reach the server. Please try again." }
+  }
 
   if (!response.ok) {
     return { ok: false, error: `Failed to create event (${response.status})` }

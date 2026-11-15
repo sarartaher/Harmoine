@@ -7,6 +7,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "react-toastify";
 
 function Field({
   id,
@@ -114,10 +115,11 @@ export function SignUpForm() {
         setError(signUpError.message || "Registration failed.");
       } else {
         // Registration successful
+        toast.success("Account created successfully!");
         router.push("/");
         router.refresh();
       }
-    } catch (error) {
+    } catch {
       setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);

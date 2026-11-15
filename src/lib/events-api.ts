@@ -17,7 +17,13 @@ import type { EventDetail } from "@/interfaces"
 export async function getEventBySlug(slug: string): Promise<EventDetail | null> {
   const url = apiUrl(endpoints.events)
 
-  const response = await fetch(url, { cache: "no-store" })
+  let response: Response
+  try {
+    response = await fetch(url, { cache: "no-store" })
+  } catch {
+    // Backend is unreachable — treat as "not found" instead of crashing.
+    return null
+  }
 
   if (!response.ok) {
     throw new Error(`Failed to load events (${response.status})`)

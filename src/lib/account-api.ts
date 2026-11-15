@@ -40,6 +40,9 @@ export function getManagedEvents() {
   return getList<ManagedEvent[]>(endpoints.managedEvents)
 }
 
-export function getJoinedEvents() {
-  return getList<JoinedEvent[]>(endpoints.joinedEvents)
+export function getJoinedEvents(email?: string) {
+  const path = email
+    ? `${endpoints.joinedEvents}?email=${encodeURIComponent(email)}`
+    : endpoints.joinedEvents
+  return getList<JoinedEvent[]>(path)
 }

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useAppData } from "@/components/providers/app-data-provider"
 import { createManagedEvent } from "@/app/account/events/actions"
+import { toast } from "react-toastify"
 
 const inputClass =
   "h-10 w-full rounded-lg border border-violet-100 bg-violet-50/60 px-3 text-sm outline-none transition hover:bg-violet-50 focus-visible:border-violet-400 focus-visible:ring-2 focus-visible:ring-violet-400/50 dark:border-violet-900/40 dark:bg-violet-950/30 dark:hover:bg-violet-950/50"
@@ -29,6 +30,12 @@ export function CreateEventForm() {
   const [status, setStatus] = React.useState<"draft" | "published">("draft")
 
   const error = state?.ok === false ? state.error : null
+
+  React.useEffect(() => {
+    if (state?.ok) {
+      toast.success("Event created successfully!")
+    }
+  }, [state])
 
   const categoryOptions =
     categories.length > 0 ? categories : ["Cleanup", "Plantation", "Donation"]
@@ -116,14 +123,14 @@ export function CreateEventForm() {
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="image" className={labelClass}>
-          Thumbnail image URL <span className="font-normal text-slate-400">(optional)</span>
+        <label htmlFor="thumbnail" className={labelClass}>
+          Thumbnail image <span className="font-normal text-slate-400">(optional)</span>
         </label>
         <Input
-          id="image"
-          name="image"
-          type="url"
-          placeholder="https://example.com/photo.jpg"
+          id="thumbnail"
+          name="thumbnail"
+          type="file"
+          accept="image/*"
           className={inputClass}
         />
       </div>
