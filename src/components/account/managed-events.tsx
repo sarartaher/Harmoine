@@ -89,6 +89,13 @@ function EventActions({ event }: { event: ManagedEvent }) {
         View
       </Link>
 
+      <Link
+        href={`/account/events/${event._id}/edit`}
+        className="inline-flex h-7 items-center rounded-lg border border-border bg-background px-2.5 text-sm font-medium text-foreground outline-none transition hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 dark:border-input dark:bg-input/30 dark:hover:bg-input/50"
+      >
+        Edit
+      </Link>
+
       {event.status === "published" ? (
         <form action={setManagedEventStatus}>
           <input type="hidden" name="slug" value={event._id} />
@@ -136,8 +143,12 @@ function attendeesText(event: ManagedEvent) {
 export function ManagedEvents({ events }: { events: ManagedEvent[] }) {
   const [query, setQuery] = React.useState("")
   const [status, setStatus] = React.useState<ManagedEventsFilter>("all")
+  const [category, setCategory] = React.useState("All")
 
   const search = query.trim().toLowerCase()
+
+  // Extract unique categories from events
+  const categories = ["All", ...new Set(events.map((e) => e.eventType).filter(Boolean))]
 
   const filtered = events.filter((event) => {
     const matchesSearch =
@@ -146,8 +157,9 @@ export function ManagedEvents({ events }: { events: ManagedEvent[] }) {
       event.location.toLowerCase().includes(search)
 
     const matchesStatus = status === "all" || event.status === status
+    const matchesCategory = category === "All" || event.eventType === category
 
-    return matchesSearch && matchesStatus
+    return matchesSearch && matchesStatus && matchesCategory
   })
 
   return (
@@ -165,6 +177,32 @@ export function ManagedEvents({ events }: { events: ManagedEvent[] }) {
           />
         </div>
 
+        <div
+          className="flex flex-wrap gap-2"
+          role="group"
+          aria-label="Filter by category"
+        >
+          {categories.map((cat) => {
+            const active = category === cat
+            return (
+              <Button
+                key={cat}
+                type="button"
+                aria-pressed={active}
+                onClick={() => setCategory(cat)}
+                variant="outline"
+                className={cn(
+                  "h-9 rounded-full px-4",
+                  active
+                    ? "border-transparent bg-violet-600 text-white hover:bg-violet-500 dark:bg-violet-500 dark:text-white dark:hover:bg-violet-400"
+                    : "border-violet-100 bg-white text-slate-700 hover:bg-violet-50 hover:text-violet-700 dark:border-violet-900/40 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-violet-950/40"
+                )}
+              >
+                {cat}
+              </Button>
+            )
+          })}
+        </div>
         <div
           className="flex flex-wrap gap-2"
           role="group"

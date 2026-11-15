@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import { useActionState } from "react"
-import { useFormStatus } from "react-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useAppData } from "@/components/providers/app-data-provider"
@@ -22,12 +21,10 @@ const textareaClass =
  *
  * The event type comes from the backend categories list. The date must be in
  * the future; the server action re-validates before calling the backend.
- * Saving as draft or publishing are both supported.
  */
 export function CreateEventForm() {
   const { categories, loading } = useAppData()
-  const [state, formAction] = useActionState(createManagedEvent, null)
-  const [status, setStatus] = React.useState<"draft" | "published">("draft")
+  const [state, formAction, isPending] = useActionState(createManagedEvent, null)
 
   const error = state?.ok === false ? state.error : null
 
@@ -135,8 +132,6 @@ export function CreateEventForm() {
         />
       </div>
 
-      <input type="hidden" name="status" value={status} />
-
       {error ? (
         <p role="alert" className="rounded-lg bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700 dark:bg-rose-500/10 dark:text-rose-300">
           {error}
@@ -144,41 +139,10 @@ export function CreateEventForm() {
       ) : null}
 
       <div className="flex flex-wrap gap-3">
-        <SubmitButton
-          label="Save as draft"
-          pendingLabel="Creating..."
-          onClick={() => setStatus("draft")}
-        />
-        <SubmitButton
-          label="Publish"
-          pendingLabel="Creating..."
-          onClick={() => setStatus("published")}
-        />
+        <Button type="submit" className="h-10 rounded-full px-5">
+          {isPending ? "Creating..." : "Create Event"}
+        </Button>
       </div>
     </form>
-  )
-}
-
-function SubmitButton({
-  label,
-  pendingLabel,
-  onClick,
-}: {
-  label: string
-  pendingLabel: string
-  onClick: () => void
-}) {
-  const { pending } = useFormStatus()
-
-  return (
-    <Button
-      type="submit"
-      variant="outline"
-      disabled={pending}
-      onClick={onClick}
-      className="h-10 rounded-full px-5"
-    >
-      {pending ? pendingLabel : label}
-    </Button>
   )
 }

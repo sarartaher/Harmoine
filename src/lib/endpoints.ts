@@ -27,7 +27,7 @@ export const endpoints = {
   managedEvent: (slug: string) => `/account/events/${encodeURIComponent(slug)}`,
 
   /** Create a new event: POST /account/events -> ManagedEvent */
-  createEvent: "/account/events",
+  createEvent: "/events",
 
   /** Join an event: POST /events/{slug}/join */
   eventJoin: (slug: string) => `/events/${encodeURIComponent(slug)}/join`,

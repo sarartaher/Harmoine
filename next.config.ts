@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   experimental: {
     agentFeedback: true,
+    serverActions: {
+      bodySizeLimit: "5mb",
+    },
   },
   // The auth routes live at /sign-in and /sign-up (matching the component
   // file names). Redirects match case-insensitively, so these lowercase

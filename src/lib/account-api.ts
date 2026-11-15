@@ -24,8 +24,8 @@ async function getList<T>(path: string): Promise<T> {
 
   const response = await fetch(apiUrl(path), { cache: "no-store" })
 
-  // The backend may not have these endpoints yet — treat 404 as "no data".
-  if (response.status === 404) {
+  // The backend may not have these endpoints yet — treat 404/400 as "no data".
+  if (response.status === 404 || response.status === 400) {
     return [] as unknown as T
   }
 
@@ -36,8 +36,11 @@ async function getList<T>(path: string): Promise<T> {
   return (await response.json()) as T
 }
 
-export function getManagedEvents() {
-  return getList<ManagedEvent[]>(endpoints.managedEvents)
+export function getManagedEvents(category?: string) {
+  const path = category && category !== "all"
+    ? `${endpoints.managedEvents}?category=${encodeURIComponent(category)}`
+    : endpoints.managedEvents
+  return getList<ManagedEvent[]>(path)
 }
 
 export function getJoinedEvents(email?: string) {

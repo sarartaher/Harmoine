@@ -20,8 +20,12 @@ async function JoinedEventsContent() {
     headers: await headers(),
   })
   const email = session?.user?.email
-  const events = await getJoinedEvents(email)
 
+  if (!email) {
+    return <JoinedEvents events={[]} />
+  }
+
+  const events = await getJoinedEvents(email)
   return <JoinedEvents events={events} />
 }
 
