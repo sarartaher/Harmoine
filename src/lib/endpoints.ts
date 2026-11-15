@@ -8,6 +8,7 @@
 export const endpoints = {
   /** List of event cards: GET -> EventSummary[] */
   events: "/events",
+  recentEvents: "/events/recent",
   /** Gallery photos: GET -> GalleryImage[] */
   gallery: "/gallery",
   /** Filter pills for /events: GET -> string[] */
@@ -23,13 +24,11 @@ export const endpoints = {
   /** Events the user joined: GET -> JoinedEvent[] */
   joinedEvents: "/account/joined",
   /** Update or delete one managed event: PATCH / DELETE */
-  managedEvent: (slug: string) =>
-    `/account/events/${encodeURIComponent(slug)}`,
+  managedEvent: (slug: string) => `/account/events/${encodeURIComponent(slug)}`,
 
   /** Create a new event: POST /account/events -> ManagedEvent */
   createEvent: "/account/events",
 
   /** Join an event: POST /events/{slug}/join */
-  eventJoin: (slug: string) =>
-    `/events/${encodeURIComponent(slug)}/join`,
-}
+  eventJoin: (slug: string) => `/events/${encodeURIComponent(slug)}/join`,
+};

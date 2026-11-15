@@ -1,78 +1,99 @@
-"use client"
+"use client";
 
-// Global data shared by the home page, the events list, and the navbar.
-// Everything is fetched from the backend endpoints in `src/lib/endpoints.ts`.
-
-import * as React from "react"
+import * as React from "react";
 import type {
   AccountProfile,
   AppData,
   EventSummary,
   GalleryImage,
-} from "@/interfaces"
-import { apiUrl } from "@/lib/api"
-import { endpoints } from "@/lib/endpoints"
+} from "@/interfaces";
+import { apiUrl } from "@/lib/api";
+import { endpoints } from "@/lib/endpoints";
 
+// Default data before the backend responds
 const emptyData: AppData = {
   events: [],
+  recentEvents: [],
   categories: [],
   gallery: [],
   profile: null,
   loading: true,
-}
+};
 
-const AppDataContext = React.createContext<AppData>(emptyData)
-
-async function getJson<T>(path: string, signal: AbortSignal): Promise<T | null> {
-  try {
-    const response = await fetch(apiUrl(path), { signal })
-    if (!response.ok) {
-      return null
-    }
-    return (await response.json()) as T
-  } catch {
-    // A missing or offline backend simply leaves this section empty.
-    return null
-  }
-}
+// Create a place to share data with other components
+const AppDataContext = React.createContext<AppData>(emptyData);
 
 export function AppDataProvider({ children }: { children: React.ReactNode }) {
-  const [data, setData] = React.useState<AppData>(emptyData)
+  const [data, setData] = React.useState<AppData>(emptyData);
 
   React.useEffect(() => {
-    const controller = new AbortController()
+    async function loadData() {
+      try {
+        // Get data from the backend
+        const [
+          eventsResponse,
+          recentEventsResponse,
+          categoriesResponse,
+          galleryResponse,
+          profileResponse,
+        ] = await Promise.all([
+          fetch(apiUrl(endpoints.events)),
+          fetch(apiUrl(endpoints.recentEvents)),
+          fetch(apiUrl(endpoints.categories)),
+          fetch(apiUrl(endpoints.gallery)),
+          fetch(apiUrl(endpoints.profile)),
+        ]);
 
-    async function load() {
-      const [events, categories, gallery, profile] = await Promise.all([
-        getJson<EventSummary[]>(endpoints.events, controller.signal),
-        getJson<string[]>(endpoints.categories, controller.signal),
-        getJson<GalleryImage[]>(endpoints.gallery, controller.signal),
-        getJson<AccountProfile>(endpoints.profile, controller.signal),
-      ])
+        // Convert the responses into JavaScript data
+        const events: EventSummary[] = eventsResponse.ok
+          ? await eventsResponse.json()
+          : [];
 
-      if (controller.signal.aborted) {
-        return
+        const recentEvents: EventSummary[] = recentEventsResponse.ok
+          ? await recentEventsResponse.json()
+          : [];
+
+        const categories: string[] = categoriesResponse.ok
+          ? await categoriesResponse.json()
+          : [];
+
+        const gallery: GalleryImage[] = galleryResponse.ok
+          ? await galleryResponse.json()
+          : [];
+
+        const profile: AccountProfile | null = profileResponse.ok
+          ? await profileResponse.json()
+          : null;
+
+        // Save all the data in React state
+        setData({
+          events,
+          recentEvents,
+          categories,
+          gallery,
+          profile,
+          loading: false,
+        });
+      } catch (error) {
+        console.error("Failed to load app data:", error);
+
+        // Stop loading even if the backend request fails
+        setData({
+          ...emptyData,
+          loading: false,
+        });
       }
-
-      setData({
-        events: events ?? [],
-        categories: categories ?? [],
-        gallery: gallery ?? [],
-        profile: profile ?? null,
-        loading: false,
-      })
     }
 
-    load()
-
-    return () => controller.abort()
-  }, [])
+    loadData();
+  }, []);
 
   return (
     <AppDataContext.Provider value={data}>{children}</AppDataContext.Provider>
-  )
+  );
 }
 
+// Use this function to access shared data
 export function useAppData() {
-  return React.useContext(AppDataContext)
+  return React.useContext(AppDataContext);
 }
